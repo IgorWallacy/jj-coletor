@@ -17,8 +17,10 @@ const Menu = ({ navigation }) => {
     api.interceptors.request.use(
       async (config) => {
         const token = await AsyncStorage.getItem("access_token");
+        const baseURL = await AsyncStorage.getItem("ip-servidor");
         let a = JSON.parse(token);
         if (a) {
+          config.baseURL = "http://"+baseURL+":1010"
           config.headers["Authorization"] = "bearer " + a.access_token;
         }
         // console.log(a.access_token)
@@ -39,9 +41,9 @@ const Menu = ({ navigation }) => {
       justifyContent="center"
       bg={{
         linearGradient: {
-          colors: ["#C8555F", "#C8555A"],
-          start: [0, 0],
-          end: [1, 0],
+          colors: [ "#eb575a", "#708090"],
+          start: [1, 0],
+          end: [0, 0],
         },
       }}
       p="5"
@@ -65,7 +67,7 @@ const Menu = ({ navigation }) => {
                 />
               }
             >
-              Iniciar contagem
+              Carregar inventários
             </Button>
           
         </VStack>
