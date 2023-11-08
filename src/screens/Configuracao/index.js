@@ -64,6 +64,7 @@ const ConfiguracaoComponent = ({ navigation }) => {
         <Card.Content>
           <Text m='2'> {baseUrl ? 'Configuração atual : ' + baseUrl : ' Nenhuma configuração salva'}</Text>
           <TextInput
+            keyboardType="url"
             label="Endereço do servidor"
             placeholder="Exemplo : 192.168.0.100"
             value={servidor}

@@ -60,7 +60,6 @@ const ListaInventarios = ({ navigation }) => {
           end: [0, 0],
         },
       }}
-    
     >
       {loading ? (
         <>
@@ -83,57 +82,77 @@ const ListaInventarios = ({ navigation }) => {
             renderItem={({ item }) => {
               return (
                 <ScrollView>
-                  <VStack space="1" p='2' w='96'>
+                  <VStack space="1" p="2" w="96">
                     <Card>
-                      <Card.Content >
-                        <Text fontWeight='extrabold' color={item?.status ? 'green.800' : 'red.500'} fontSize="md">
+                      <Card.Content>
+                        <Text
+                          fontWeight="extrabold"
+                          color={item?.status ? "green.800" : "red.500"}
+                          fontSize="md"
+                        >
                           {item?.id} - {item?.nome?.toUpperCase()}
                         </Text>
-                        <Text fontWeight='bold' color={item?.status ? 'green.800' : 'red.500'} fontSize="md">
+                        <Text
+                          fontWeight="bold"
+                          color={item?.status ? "green.800" : "red.500"}
+                          fontSize="md"
+                        >
                           Status : {item?.status ? "Aberto" : "Fechado"}
                         </Text>
-                        <Text color={item?.status ? 'green.800' : 'red.500'} fontSize="md">
-                          Abertura:
-                          {moment(item?.dataInicio).format("DD/MM/YYYY - dddd")}
+                        <Text
+                          color={item?.status ? "green.800" : "red.500"}
+                          fontSize="md"
+                        >
+                          Abertura :{" "}
+                          {moment(item?.inicio).format("DD/MM/YYYY - dddd")}
                         </Text>
-                        <Text color={item?.status ? 'green.800' : 'red.500'} fontSize="md">
-                          Termino:
-                          {moment(item?.dataInicio).format("DD/MM/YYYY - dddd")}
-                        </Text>
+                        {item?.fim ? (
+                          <>
+                            <Text
+                              color={item?.status ? "green.800" : "red.500"}
+                              fontSize="md"
+                            >
+                              Fim :{" "}
+                              {moment(item?.fim).format("DD/MM/YYYY - dddd")}
+                            </Text>
+                          </>
+                        ) : (
+                          ""
+                        )}
+
                         <HStack>
-                    {item.status ? (
-                      <Button
-                        variant="solid"
-                        colorScheme="text"
-                        rounded="md"
-                        size="lg"
-                        m="2"
-                        rightIcon={
-                          <FontAwesome5
-                            name="barcode"
-                            size={24}
-                            color="white"
-                          />
-                        }
-                        disabled={!item.status}
-                        onPress={() =>
-                          navigation.navigate("nova-contagem", {
-                            itemId: parseInt(item?.id),
-                            loja: item?.loja,
-                            idfilial: item?.idfilial,
-                          })
-                        }
-                      >
-                        {item.status ? "Iniciar contagem" : ""}
-                      </Button>
-                    ) : (
-                      <></>
-                    )}
-                  </HStack>
+                          {item.status ? (
+                            <Button
+                              variant="solid"
+                              colorScheme="text"
+                              rounded="md"
+                              size="lg"
+                              m="2"
+                              rightIcon={
+                                <FontAwesome5
+                                  name="barcode"
+                                  size={24}
+                                  color="white"
+                                />
+                              }
+                              disabled={!item.status}
+                              onPress={() =>
+                                navigation.navigate("nova-contagem", {
+                                  itemId: parseInt(item?.id),
+                                  loja: item?.loja,
+                                  idfilial: item?.idfilial,
+                                })
+                              }
+                            >
+                              {item.status ? "Iniciar contagem" : ""}
+                            </Button>
+                          ) : (
+                            <></>
+                          )}
+                        </HStack>
                       </Card.Content>
                     </Card>
                   </VStack>
-                  
                 </ScrollView>
               );
             }}

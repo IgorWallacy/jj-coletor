@@ -216,15 +216,9 @@ const NovaContagem = ({ route }) => {
                 >
                   {produto ? (
                     <>
-                      <Text
-                        color="white"
-                        fontWeight="bold"
-                        fontSize="2xl"
-                        m="2"
-                        w="80%"
-                      >
-                        {produto.nome}
-                      </Text>
+                      <Badge size="16" w="72" h="20" m="5" rounded="md">
+                        <Text fontWeight="extrabold">{produto.nome}</Text>
+                      </Badge>
                     </>
                   ) : (
                     <>
@@ -273,7 +267,6 @@ const NovaContagem = ({ route }) => {
                           <Button
                             rounded="full"
                             variant="solid"
-                           
                             onPress={() => getProduto()}
                             ml="5"
                             leftIcon={
@@ -324,28 +317,27 @@ const NovaContagem = ({ route }) => {
                         >
                           Cancelar
                         </Button>
+                        <Button
+                          isLoading={loadinfgSalvar}
+                          isLoadingText="Salvando..."
+                          disabled={!produto || !quantidade}
+                          onPress={() => salvar()}
+                          h="12"
+                          m="2"
+                          rounded="full"
+                          colorScheme="success"
+                          rightIcon={
+                            <FontAwesome5 name="plus" size={18} color="white" />
+                          }
+                        >
+                          <Text fontWeight="bold" fontSize="lg" color="#ffff">
+                            Adicionar
+                          </Text>
+                        </Button>
                       </>
                     ) : (
                       <></>
                     )}
-
-                    <Button
-                      isLoading={loadinfgSalvar}
-                      isLoadingText="Salvando..."
-                      disabled={!produto || !quantidade}
-                      onPress={() => salvar()}
-                      h="12"
-                      m="2"
-                      rounded="full"
-                      colorScheme="success"
-                      rightIcon={
-                        <FontAwesome5 name="plus" size={18} color="white" />
-                      }
-                    >
-                      <Text fontWeight="bold" fontSize="lg" color="#ffff">
-                        Adicionar
-                      </Text>
-                    </Button>
                   </Box>
                 </KeyboardAvoidingView>
                 {loading2 ? (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFonts, Inter_900Black } from "@expo-google-fonts/inter";
 
 import base64 from "react-native-base64";
@@ -7,15 +7,9 @@ import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import {
-  Text,
-  Box,
-  Button,
-  Input,
-  Image,
-  KeyboardAvoidingView,
-} from "native-base";
-import { Alert, Platform } from "react-native";
+import { Text, Box, Button, Image, KeyboardAvoidingView } from "native-base";
+import { Platform, Alert } from "react-native";
+import { TextInput } from "react-native-paper";
 
 export default function Login({ navigation }) {
   const [usuario, setUsuario] = useState();
@@ -44,14 +38,9 @@ export default function Login({ navigation }) {
 
   var headers = {
     Authorization: "Basic " + base64.encode(`${clientId}:${clientSecret}`),
-    "Content-Type": "application/x-www-form-urlencoded",
+    "content-type": "application/x-www-form-urlencoded",
+    "content-type": "multipart/form-data",
   };
-
-  const api = axios.create({
-    baseURL: baseUrl,
-    headers: headers,
-    params: params,
-  });
 
   const getBaseURLAsyncStorage = async () => {
     try {
@@ -65,6 +54,13 @@ export default function Login({ navigation }) {
       Alert.alert("Erro", "Não foi possível ler o ip do servidor");
     }
   };
+
+  const api = axios.create({
+    baseURL: baseUrl ? baseUrl : getBaseURLAsyncStorage(),
+    headers: headers,
+    params: params,
+    timeout: 10000,
+  });
 
   const login = async () => {
     getBaseURLAsyncStorage();
@@ -123,7 +119,7 @@ export default function Login({ navigation }) {
       <Image
         source={require("../../../assets/images/logo_login.png")}
         alt="Logo"
-        size="200"
+        size="150"
       />
       <Text
         style={{
@@ -142,30 +138,30 @@ export default function Login({ navigation }) {
         behavior={Platform.OS == "ios" ? "padding" : "height"}
         w="95%"
       >
-        <Box>
-          <Input
+        <Box m="1">
+          <TextInput
+            onFocus={() => getBaseURLAsyncStorage()}
             value={usuario}
             onChangeText={(e) => setUsuario(e)}
             keyboardType="email-address"
             type="text"
-            variant="rounded"
             bgColor={"blue.100"}
             size="2xl"
             placeholder="Código"
-            m="1"
+            label="Código"
           />
         </Box>
-        <Box>
-          <Input
+        <Box m="1">
+          <TextInput
             value={senha}
             onChangeText={(e) => setSenha(e)}
             type="password"
             keyboardType="numbers-and-punctuation"
-            variant="rounded"
+            secureTextEntry
             bgColor={"blue.100"}
             size="2xl"
             placeholder="Senha"
-            m="1"
+            label="Senha"
           />
         </Box>
         <Box rounded="lg" width="95%" m="1.5">
