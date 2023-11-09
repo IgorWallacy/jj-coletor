@@ -14,7 +14,7 @@ import {
 
 import { ListItem, Button as Button2 } from "@rneui/themed";
 
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 
 import { BarCodeScanner } from "expo-barcode-scanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -115,18 +115,20 @@ const NovaContagem = ({ route }) => {
   const salvar = () => {
     //  console.log(produto);
     setLoadingSalvar(true);
+    let q =  parseFloat(quantidade.replace(',', '.'))
     return api
       .post("/api/produto/contagem/salvar", {
         idproduto: produto?.id,
         idinventario: parseInt(JSON.stringify(route.params.itemId)),
         produto: produto?.nome,
-        idfilial: 1,
-        quantidadeLida: quantidade,
+        idfilial: parseInt(JSON.stringify(route.params.idfilial)),
+        quantidadeLida: q,
         nomeUsuario: nomeUsuario,
       })
       .then((r) => {
-        Alert.alert("Sucesso", `${produto?.ean} - ${produto?.nome} adicionado`);
+        Alert.alert("Sucesso", `${produto?.ean} - ${produto?.nome}   adicionado`);
         setProduto(null);
+        setQuantidade(null)
       })
       .catch((e) => {
         alert(e?.message);
@@ -140,9 +142,10 @@ const NovaContagem = ({ route }) => {
   return (
     <>
       <Box
-        w="container"
-        safeAreaTop={8}
+        
+       
         flex={1}
+        
         alignItems="center"
         //   justifyContent="flex-start"
         bg={{
@@ -155,11 +158,11 @@ const NovaContagem = ({ route }) => {
         p={1}
       >
         {openScanner === true ? (
-          <Box w="100%" h="container">
+          <Box w="100%" h="96">
             <BarCodeScanner
               onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
               style={{
-                height: 300,
+                height: 600,
                 width: "100%",
               }}
             />
@@ -167,7 +170,7 @@ const NovaContagem = ({ route }) => {
             <Button
               colorScheme="danger"
               rounded="xl"
-              mt="5"
+              mt="4"
               onPress={() => {
                 setScanned(false);
                 setOpenScanner(false);
@@ -191,9 +194,9 @@ const NovaContagem = ({ route }) => {
           <Box>
             {loading ? (
               <>
-                <Box w="container">
+                <Box w="container" >
                   <Text color="#f2f2f2" fontSize="2xl">
-                    Buscando produto...
+                    Consultando 
                   </Text>
                   <ProgressBar
                     indeterminate
@@ -204,20 +207,47 @@ const NovaContagem = ({ route }) => {
               </>
             ) : (
               <>
-                <Text fontSize="2xl" color="white">
-                  Inventário#{JSON.stringify(route.params.itemId)} -{" "}
+                <Text fontSize="2xl" m={2} color="white">
+                  Inventário#{JSON.stringify(route.params.itemId)} - 
                   {JSON.stringify(route.params.loja)}
                 </Text>
+                <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
+
+                
+                <Button w={16}
+                    rounded="full"
+                    m={2}
+                    variant="solid"
+                    onPress={() => setOpenScanner(true)}
+                    rightIcon={
+                      <FontAwesome5 name="camera" size={28} color="white" />
+                    }
+                  />
+                   <Button w={16}
+                    rounded="full"
+                    m={2}
+                    variant="solid"
+                    onPress={() => getListProduto()}
+                    rightIcon={
+                      <FontAwesome name="refresh" size={28} color="white" />
+                    }
+                  />
+                </Box>
+               
                 <Box
-                  w="100%"
+                  w="container"
                   flexDirection="row"
                   justifyContent="center"
                   alignItems="center"
+                  
+                
                 >
                   {produto ? (
                     <>
-                      <Badge size="16" w="72" h="20" m="5" rounded="md">
-                        <Text fontWeight="extrabold">{produto.nome}</Text>
+                      <Badge size="16" w="96" h="20" m="5" rounded="md">
+                      <Text fontSize={12}>{produto?.ean ? produto?.ean : produto?.codigo}</Text>
+                        <Text fontSize={18} fontWeight="extrabold"> {produto.nome}</Text>
+                        
                       </Badge>
                     </>
                   ) : (
@@ -226,53 +256,48 @@ const NovaContagem = ({ route }) => {
                         color="#fff"
                         fontWeight="bold"
                         fontSize="15"
-                        m="2"
+                        
                         w="80%"
                       ></Text>
                     </>
                   )}
 
-                  <Button
-                    rounded="full"
-                    mr="5"
-                    variant="solid"
-                    onPress={() => setOpenScanner(true)}
-                    rightIcon={
-                      <FontAwesome5 name="camera" size={28} color="white" />
-                    }
-                  />
+                  
+                 
                 </Box>
+                
                 <KeyboardAvoidingView
                   behavior={Platform.OS == "ios" ? "padding" : "height"}
-                  w="95%"
+                  w="100%"
                 >
-                  <Box w="80%" marginTop="5">
+                  <Box  w="89%"  justifyContent="center" alignItems="center" >
                     {produto ? (
                       <></>
                     ) : (
                       <>
-                        <Box w="100%" flexDirection="row" m={1}>
+                        <Box w="100%" flexDirection="row">
                           <Input
                             onChangeText={(e) => setEan(e)}
                             id="ean"
                             size="2xl"
                             bgColor="#f2f2f2"
-                            w="95%"
-                            mx="2"
+                            w="90%"
+                            
                             placeholder="Digite o código ou cod.barras"
                             mb={2}
                             keyboardType="numeric"
-                            rounded="full"
+                            rounded="md"
                           />
                           <Button
+                          
                             rounded="full"
                             variant="solid"
                             onPress={() => getProduto()}
-                            ml="5"
+                            ml={4}
                             leftIcon={
                               <FontAwesome5
                                 name="search"
-                                size={24}
+                                size={26}
                                 color="white"
                               />
                             }
@@ -281,30 +306,33 @@ const NovaContagem = ({ route }) => {
                       </>
                     )}
                   </Box>
-                  <Box flexDirection="column">
+                  <Box flexDirection="column" w={96} p={5}>
                     {produto ? (
                       <>
-                        <Box w="96">
-                          <Input
+                        <Box>
+                          <Input w="container"
                             onChangeText={(e) => setQuantidade(e)}
                             id="quantidade"
                             clearTextOnFocus
                             size="2xl"
                             bgColor="#f2f2f2"
-                            w="95%"
-                            mx="2"
+                           
+                            m="2"
                             placeholder="Informe a quantidade"
-                            keyboardType="numeric"
-                            rounded="full"
+                            keyboardType="decimal-pad"
+                            rounded="md"
+                            autoCapitalize="words"
+                           
                           />
                         </Box>
 
                         <Button
                           onPress={(e) => {
                             setProduto(null);
+                            setQuantidade(null)
                           }}
                           h="12"
-                          m="4"
+                          m="2"
                           rounded="full"
                           colorScheme="danger"
                           leftIcon={
@@ -342,8 +370,8 @@ const NovaContagem = ({ route }) => {
                 </KeyboardAvoidingView>
                 {loading2 ? (
                   <>
-                    <Box w="container">
-                      <Text color="#f2f2f2" fontSize="2xl">
+                    <Box w="container"   >
+                      <Text  p={5}   color="#f2f2f2" fontSize="2xl">
                         Carregando produtos ...
                       </Text>
                       <ProgressBar
@@ -356,10 +384,10 @@ const NovaContagem = ({ route }) => {
                 ) : (
                   <>
                     <ScrollView>
-                      <VStack w="full" m={1} bgColor={"#f2f2f2"}>
+                      <VStack w="container" my={2} >
                         {produtoList.map((item, i) => (
                           <>
-                            <ListItem.Swipeable
+                            <ListItem.Swipeable 
                               key={item?.id ? item.id : i}
                               topDivider
                               rightContent={(reset) => (
@@ -369,19 +397,19 @@ const NovaContagem = ({ route }) => {
                                     reset();
                                     return api
                                       .delete(
-                                        `/api/produto/contagem/inventario/item/${item?.id}`
+                                        `/api/produto/contagem/inventario/item/${item?.idproduto}`
                                       )
                                       .then((r) => {
                                         Alert.alert(
                                           "Suceeso",
                                           `Produto ${
                                             item?.produto + " "
-                                          } deletado`
+                                          } excluído`
                                         );
                                         getListProduto();
                                       })
                                       .catch((e) => {
-                                        alert(e?.message);
+                                       Alert.alert('Erro ao excluir ' , e?.message);
                                       });
                                   }}
                                   icon={{ name: "delete", color: "white" }}
@@ -404,7 +432,10 @@ const NovaContagem = ({ route }) => {
                                   fontWeight="bold"
                                   color="white"
                                 >
-                                  {item?.quantidadeLida}
+                                  {Intl.NumberFormat("pt-BR", {
+                                    minimumFractionDigits: "0",
+                                    maximumFractionDigits: "3",
+                                  }).format(item?.quantidadeLida)}
                                 </Text>
                               </Badge>
                               <ListItem.Chevron />

@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "jj-coletor",
+    "name": "JJ-coletor",
     "slug": "jj-coletor",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -51,7 +51,7 @@
         "android.permission.CAMERA"
       ],
       "package": "com.igorwallacy.doks.jjColetor",
-      "versionCode" : 5
+      "versionCode" : 6
       
     },
     "web": {

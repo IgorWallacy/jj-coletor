@@ -104,9 +104,9 @@ export default function Login({ navigation }) {
       }}
       p="10"
     >
-      <Box rounded="lg" m="1.5">
+      <Box  >
         <Button
-          mb="5"
+          mb={5}
           leftIcon={<MaterialIcons name="settings" size={24} color="white" />}
           colorScheme="warmGray"
           borderRadius="full"
@@ -119,7 +119,7 @@ export default function Login({ navigation }) {
       <Image
         source={require("../../../assets/images/logo_login.png")}
         alt="Logo"
-        size="150"
+        size={140}
       />
       <Text
         style={{

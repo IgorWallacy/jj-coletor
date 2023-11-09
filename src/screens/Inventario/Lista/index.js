@@ -8,6 +8,8 @@ import {
   ScrollView,
 } from "native-base";
 
+
+
 import {
   ProgressBar,
   MD3Colors,
@@ -15,7 +17,7 @@ import {
   Text as TextP,
 } from "react-native-paper";
 
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5,FontAwesome } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import api from "../../../service/axios";
 import moment from "moment";
@@ -49,7 +51,7 @@ const ListaInventarios = ({ navigation }) => {
 
   return (
     <Box
-      safeAreaTop="8"
+      safeAreaTop="1"
       flex={1}
       alignItems="center"
       justifyContent="center"
@@ -64,6 +66,7 @@ const ListaInventarios = ({ navigation }) => {
       {loading ? (
         <>
           <Box w="container">
+            
             <Text color="#f2f2f2" fontSize="2xl">
               Carregando...
             </Text>
@@ -81,6 +84,18 @@ const ListaInventarios = ({ navigation }) => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
               return (
+                <>
+                <Box flexDirection="row-reverse">
+                <Button w={16}
+                    rounded="full"
+                    m={2}
+                    variant="solid"
+                    onPress={() => getInventario()}
+                    rightIcon={
+                      <FontAwesome name="refresh" size={28} color="white" />
+                    }
+                  />
+                </Box>
                 <ScrollView>
                   <VStack space="1" p="2" w="96">
                     <Card>
@@ -154,6 +169,7 @@ const ListaInventarios = ({ navigation }) => {
                     </Card>
                   </VStack>
                 </ScrollView>
+                </>
               );
             }}
           />
