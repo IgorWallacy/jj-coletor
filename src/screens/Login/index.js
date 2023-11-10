@@ -91,6 +91,22 @@ export default function Login({ navigation }) {
   };
 
   return (
+    <KeyboardAvoidingView
+    flex={1}
+    behavior={Platform.OS == "ios" ? "padding" : "height"}
+    w="100%"
+  >
+    <Image
+        source={require("../../../assets/images/logo_jj.png")}
+        alt="Logo"
+       width="100%"
+       height={130}
+      />
+     
+      
+     
+      
+      
     <Box
       flex={1}
       alignItems="center"
@@ -102,43 +118,18 @@ export default function Login({ navigation }) {
           end: [0, 0],
         },
       }}
-      p="10"
+      
+      width="100%"
+      p={5}
     >
-      <Box  >
-        <Button
-          mb={5}
-          leftIcon={<MaterialIcons name="settings" size={24} color="white" />}
-          colorScheme="warmGray"
-          borderRadius="full"
-          size="lg"
-          onPress={() => navigation.navigate("configuracao")}
-        >
-          <Text color="white">Configurar</Text>
-        </Button>
-      </Box>
-      <Image
-        source={require("../../../assets/images/logo_login.png")}
-        alt="Logo"
-        size={140}
-      />
-      <Text
-        style={{
-          fontFamily: "Inter_900Black",
-          fontSize: 20,
-          color: "#f4f5f1",
-        }}
-      >
-        JJ Coletor{" "}
-      </Text>
-      <Text color="white"> API - {baseUrl}</Text>
-      <Text fontSize="lg" m="0.5" color="#FFFF">
+      
+      
+      
+      <Text fontSize="md" m="0.5" color="#FFFF">
         Informe sua conta uniplus
       </Text>
-      <KeyboardAvoidingView
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
-        w="95%"
-      >
-        <Box m="1">
+     
+        <Box m="1" w="100%">
           <TextInput
             onFocus={() => getBaseURLAsyncStorage()}
             value={usuario}
@@ -151,7 +142,7 @@ export default function Login({ navigation }) {
             label="Código"
           />
         </Box>
-        <Box m="1">
+        <Box m="1" w="100%">
           <TextInput
             value={senha}
             onChangeText={(e) => setSenha(e)}
@@ -179,7 +170,34 @@ export default function Login({ navigation }) {
             Entrar
           </Button>
         </Box>
-      </KeyboardAvoidingView>
+        
+        <Box justifyContent="center" alignItems="center" >
+        <Text mt={10}
+        style={{
+          fontFamily: "Inter_900Black",
+          fontSize: 22,
+          color: "#f4f5f1",
+        }}
+      >
+        JJ Coletor
+      </Text>
+        <Text color="#f2f2f2"> API - {baseUrl}</Text>
+        <Box  >
+        <Button
+          mt={5}
+          leftIcon={<MaterialIcons name="settings" size={24} color="white" />}
+          colorScheme="warmGray"
+          borderRadius="full"
+          size="lg"
+          onPress={() => navigation.navigate("configuracao")}
+        >
+          <Text color="white">Configurar</Text>
+        </Button>
+      </Box>
+
+        </Box>
     </Box>
+    
+    </KeyboardAvoidingView>
   );
 }

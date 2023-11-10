@@ -42,12 +42,13 @@ const NovaContagem = ({ route }) => {
     setLoading2(true);
     return api
       .get(
-        `/api/produto/contagem/porInventario/${JSON.stringify(
+        `/api/produto/contagem/porInventario/mobile/${JSON.stringify(
           route.params.itemId
         )}`
       )
       .then((r) => {
         setProdutoList(r.data);
+       // console.log(r.data)
       })
       .catch((e) => {
         alert(e?.message);
@@ -102,6 +103,7 @@ const NovaContagem = ({ route }) => {
         r?.data?.length === 0
           ? Alert.alert("Aviso", "Nenhum produto encontrado")
           : setProduto(r.data);
+        //  console.log(r.data)
       })
       .catch((e) => {
         alert(e?.message);
@@ -115,7 +117,7 @@ const NovaContagem = ({ route }) => {
   const salvar = () => {
     //  console.log(produto);
     setLoadingSalvar(true);
-    let q =  parseFloat(quantidade.replace(',', '.'))
+    let q = parseFloat(quantidade.replace(",", "."));
     return api
       .post("/api/produto/contagem/salvar", {
         idproduto: produto?.id,
@@ -126,9 +128,12 @@ const NovaContagem = ({ route }) => {
         nomeUsuario: nomeUsuario,
       })
       .then((r) => {
-        Alert.alert("Sucesso", `${produto?.ean} - ${produto?.nome}   adicionado`);
+        Alert.alert(
+          "Sucesso",
+          `${produto?.ean} - ${produto?.nome}   adicionado`
+        );
         setProduto(null);
-        setQuantidade(null)
+        setQuantidade(null);
       })
       .catch((e) => {
         alert(e?.message);
@@ -142,10 +147,7 @@ const NovaContagem = ({ route }) => {
   return (
     <>
       <Box
-        
-       
         flex={1}
-        
         alignItems="center"
         //   justifyContent="flex-start"
         bg={{
@@ -158,7 +160,7 @@ const NovaContagem = ({ route }) => {
         p={1}
       >
         {openScanner === true ? (
-          <Box w="100%" h="96">
+          <Box w="100%" h="50%">
             <BarCodeScanner
               onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
               style={{
@@ -194,9 +196,9 @@ const NovaContagem = ({ route }) => {
           <Box>
             {loading ? (
               <>
-                <Box w="container" >
+                <Box w="container">
                   <Text color="#f2f2f2" fontSize="2xl">
-                    Consultando 
+                    Consultando
                   </Text>
                   <ProgressBar
                     indeterminate
@@ -207,47 +209,68 @@ const NovaContagem = ({ route }) => {
               </>
             ) : (
               <>
-                <Text fontSize="2xl" m={2} color="white">
-                  Inventário#{JSON.stringify(route.params.itemId)} - 
+                <Text fontSize="2xl" mx={2} color="white">
+                  Inventário#{JSON.stringify(route.params.itemId)} -
                   {JSON.stringify(route.params.loja)}
                 </Text>
-                <Box flexDirection="row-reverse" justifyContent="space-between" alignItems="center">
-
-                
-                <Button w={16}
+                <Box
+                  flexDirection="row-reverse"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Button
+                    w={16}
                     rounded="full"
-                    m={2}
+                    mx={2}
                     variant="solid"
                     onPress={() => setOpenScanner(true)}
                     rightIcon={
-                      <FontAwesome5 name="camera" size={28} color="white" />
+                      <FontAwesome5 name="camera" size={20} color="white" />
                     }
                   />
-                   <Button w={16}
+                  <Button
+                    w={16}
                     rounded="full"
-                    m={2}
+                    mx={2}
                     variant="solid"
                     onPress={() => getListProduto()}
                     rightIcon={
-                      <FontAwesome name="refresh" size={28} color="white" />
+                      <FontAwesome name="refresh" size={20} color="white" />
                     }
                   />
                 </Box>
-               
+
                 <Box
                   w="container"
                   flexDirection="row"
                   justifyContent="center"
                   alignItems="center"
-                  
-                
                 >
                   {produto ? (
                     <>
-                      <Badge size="16" w="96" h="20" m="5" rounded="md">
-                      <Text fontSize={12}>{produto?.ean ? produto?.ean : produto?.codigo}</Text>
-                        <Text fontSize={18} fontWeight="extrabold"> {produto.nome}</Text>
+                      <Badge
+                      
+                       w="95%"
+                        h={16}
+                        mx="2"
+                        my="2"
+                        rounded="md"
+                      >
+                        <Box flex={1} w="100%" flexDirection="column" justifyContent="stretch" alignItems="center">
+                        <Text fontSize={10}>
+                            {produto?.ean ? produto?.ean : produto?.codigo}
+                          </Text>
+                          <Text fontSize={13} fontWeight="extrabold">
+                            {" "}
+                            {produto?.nome}
+                          </Text>
+                          <Text fontSize={10} fontWeight="extrabold">
+                            {" "}
+                            {produto?.idUnidadeMedida?.codigo}
+                          </Text>
+                        </Box>
                         
+                      
                       </Badge>
                     </>
                   ) : (
@@ -256,21 +279,17 @@ const NovaContagem = ({ route }) => {
                         color="#fff"
                         fontWeight="bold"
                         fontSize="15"
-                        
                         w="80%"
                       ></Text>
                     </>
                   )}
-
-                  
-                 
                 </Box>
-                
+
                 <KeyboardAvoidingView
                   behavior={Platform.OS == "ios" ? "padding" : "height"}
                   w="100%"
                 >
-                  <Box  w="89%"  justifyContent="center" alignItems="center" >
+                  <Box w="89%" justifyContent="center" alignItems="center">
                     {produto ? (
                       <></>
                     ) : (
@@ -282,14 +301,12 @@ const NovaContagem = ({ route }) => {
                             size="2xl"
                             bgColor="#f2f2f2"
                             w="90%"
-                            
                             placeholder="Digite o código ou cod.barras"
                             mb={2}
                             keyboardType="numeric"
                             rounded="md"
                           />
                           <Button
-                          
                             rounded="full"
                             variant="solid"
                             onPress={() => getProduto()}
@@ -310,26 +327,25 @@ const NovaContagem = ({ route }) => {
                     {produto ? (
                       <>
                         <Box>
-                          <Input w="container"
+                          <Input
+                            w="container"
                             onChangeText={(e) => setQuantidade(e)}
                             id="quantidade"
                             clearTextOnFocus
                             size="2xl"
                             bgColor="#f2f2f2"
-                           
                             m="2"
-                            placeholder="Informe a quantidade"
+                            placeholder="Quantidade #0,00"
                             keyboardType="decimal-pad"
                             rounded="md"
                             autoCapitalize="words"
-                           
                           />
                         </Box>
 
                         <Button
                           onPress={(e) => {
                             setProduto(null);
-                            setQuantidade(null)
+                            setQuantidade(null);
                           }}
                           h="12"
                           m="2"
@@ -370,8 +386,8 @@ const NovaContagem = ({ route }) => {
                 </KeyboardAvoidingView>
                 {loading2 ? (
                   <>
-                    <Box w="container"   >
-                      <Text  p={5}   color="#f2f2f2" fontSize="2xl">
+                    <Box w="container">
+                      <Text p={5} color="#f2f2f2" fontSize="2xl">
                         Carregando produtos ...
                       </Text>
                       <ProgressBar
@@ -384,10 +400,10 @@ const NovaContagem = ({ route }) => {
                 ) : (
                   <>
                     <ScrollView>
-                      <VStack w="container" my={2} >
+                      <VStack w="container" my={2}>
                         {produtoList.map((item, i) => (
                           <>
-                            <ListItem.Swipeable 
+                            <ListItem.Swipeable
                               key={item?.id ? item.id : i}
                               topDivider
                               rightContent={(reset) => (
@@ -397,7 +413,7 @@ const NovaContagem = ({ route }) => {
                                     reset();
                                     return api
                                       .delete(
-                                        `/api/produto/contagem/inventario/item/${item?.idproduto}`
+                                        `/api/produto/contagem/inventario/item/${item?.id}`
                                       )
                                       .then((r) => {
                                         Alert.alert(
@@ -409,7 +425,10 @@ const NovaContagem = ({ route }) => {
                                         getListProduto();
                                       })
                                       .catch((e) => {
-                                       Alert.alert('Erro ao excluir ' , e?.message);
+                                        Alert.alert(
+                                          "Erro ao excluir ",
+                                          e?.message
+                                        );
                                       });
                                   }}
                                   icon={{ name: "delete", color: "white" }}
@@ -420,23 +439,26 @@ const NovaContagem = ({ route }) => {
                                 />
                               )}
                             >
-                              <ListItem.Content>
+                              <ListItem.Content key={i}>
                                 <ListItem.Title>{item?.produto}</ListItem.Title>
                                 <ListItem.Subtitle>
-                                  {item?.ean}
+                                  Código - {item?.ean}
                                 </ListItem.Subtitle>
                               </ListItem.Content>
-                              <Badge backgroundColor={"green.500"}>
+                              <Badge  backgroundColor={"green.500"}>
+                                <Text color="#ffff">Quantidade</Text>
                                 <Text
                                   fontSize="xl"
                                   fontWeight="bold"
                                   color="white"
                                 >
+                                 
                                   {Intl.NumberFormat("pt-BR", {
                                     minimumFractionDigits: "0",
                                     maximumFractionDigits: "3",
                                   }).format(item?.quantidadeLida)}
                                 </Text>
+                                <Text size={6} color="#ffff">{item?.unidadeMedida}</Text>
                               </Badge>
                               <ListItem.Chevron />
                             </ListItem.Swipeable>

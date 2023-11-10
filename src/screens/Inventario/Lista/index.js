@@ -8,8 +8,6 @@ import {
   ScrollView,
 } from "native-base";
 
-
-
 import {
   ProgressBar,
   MD3Colors,
@@ -17,7 +15,7 @@ import {
   Text as TextP,
 } from "react-native-paper";
 
-import { FontAwesome5,FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import api from "../../../service/axios";
 import moment from "moment";
@@ -66,7 +64,6 @@ const ListaInventarios = ({ navigation }) => {
       {loading ? (
         <>
           <Box w="container">
-            
             <Text color="#f2f2f2" fontSize="2xl">
               Carregando...
             </Text>
@@ -79,96 +76,97 @@ const ListaInventarios = ({ navigation }) => {
         </>
       ) : (
         <>
+          <Box flexDirection="row-reverse">
+            <Button
+              
+              rounded="full"
+              m={2}
+              variant="solid"
+              onPress={() => getInventario()}
+              rightIcon={<FontAwesome name="refresh" size={28} color="white" />}
+            >
+              Recarregar
+            </Button>
+          </Box>
           <FlatList
             data={inventarioList}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
               return (
                 <>
-                <Box flexDirection="row-reverse">
-                <Button w={16}
-                    rounded="full"
-                    m={2}
-                    variant="solid"
-                    onPress={() => getInventario()}
-                    rightIcon={
-                      <FontAwesome name="refresh" size={28} color="white" />
-                    }
-                  />
-                </Box>
-                <ScrollView>
-                  <VStack space="1" p="2" w="96">
-                    <Card>
-                      <Card.Content>
-                        <Text
-                          fontWeight="extrabold"
-                          color={item?.status ? "green.800" : "red.500"}
-                          fontSize="md"
-                        >
-                          {item?.id} - {item?.nome?.toUpperCase()}
-                        </Text>
-                        <Text
-                          fontWeight="bold"
-                          color={item?.status ? "green.800" : "red.500"}
-                          fontSize="md"
-                        >
-                          Status : {item?.status ? "Aberto" : "Fechado"}
-                        </Text>
-                        <Text
-                          color={item?.status ? "green.800" : "red.500"}
-                          fontSize="md"
-                        >
-                          Abertura :{" "}
-                          {moment(item?.inicio).format("DD/MM/YYYY - dddd")}
-                        </Text>
-                        {item?.fim ? (
-                          <>
-                            <Text
-                              color={item?.status ? "green.800" : "red.500"}
-                              fontSize="md"
-                            >
-                              Fim :{" "}
-                              {moment(item?.fim).format("DD/MM/YYYY - dddd")}
-                            </Text>
-                          </>
-                        ) : (
-                          ""
-                        )}
-
-                        <HStack>
-                          {item.status ? (
-                            <Button
-                              variant="solid"
-                              colorScheme="text"
-                              rounded="md"
-                              size="lg"
-                              m="2"
-                              rightIcon={
-                                <FontAwesome5
-                                  name="barcode"
-                                  size={24}
-                                  color="white"
-                                />
-                              }
-                              disabled={!item.status}
-                              onPress={() =>
-                                navigation.navigate("nova-contagem", {
-                                  itemId: parseInt(item?.id),
-                                  loja: item?.loja,
-                                  idfilial: item?.idfilial,
-                                })
-                              }
-                            >
-                              {item.status ? "Iniciar contagem" : ""}
-                            </Button>
+                  <ScrollView>
+                    <VStack space="1" p="2" w="96">
+                      <Card>
+                        <Card.Content>
+                          <Text
+                            fontWeight="extrabold"
+                            color={item?.status ? "green.800" : "red.500"}
+                            fontSize="md"
+                          >
+                            {item?.id} - {item?.nome?.toUpperCase()}
+                          </Text>
+                          <Text
+                            fontWeight="bold"
+                            color={item?.status ? "green.800" : "red.500"}
+                            fontSize="md"
+                          >
+                            Status : {item?.status ? "Aberto" : "Fechado"}
+                          </Text>
+                          <Text
+                            color={item?.status ? "green.800" : "red.500"}
+                            fontSize="md"
+                          >
+                            Abertura :{" "}
+                            {moment(item?.inicio).format("DD/MM/YYYY - dddd")}
+                          </Text>
+                          {item?.fim ? (
+                            <>
+                              <Text
+                                color={item?.status ? "green.800" : "red.500"}
+                                fontSize="md"
+                              >
+                                Fim :{" "}
+                                {moment(item?.fim).format("DD/MM/YYYY - dddd")}
+                              </Text>
+                            </>
                           ) : (
-                            <></>
+                            ""
                           )}
-                        </HStack>
-                      </Card.Content>
-                    </Card>
-                  </VStack>
-                </ScrollView>
+
+                          <HStack>
+                            {item.status ? (
+                              <Button
+                                variant="solid"
+                                colorScheme="text"
+                                rounded="md"
+                                size="lg"
+                                m="2"
+                                rightIcon={
+                                  <FontAwesome5
+                                    name="barcode"
+                                    size={24}
+                                    color="white"
+                                  />
+                                }
+                                disabled={!item.status}
+                                onPress={() =>
+                                  navigation.navigate("nova-contagem", {
+                                    itemId: parseInt(item?.id),
+                                    loja: item?.loja,
+                                    idfilial: item?.idfilial,
+                                  })
+                                }
+                              >
+                                {item.status ? "Iniciar contagem" : ""}
+                              </Button>
+                            ) : (
+                              <></>
+                            )}
+                          </HStack>
+                        </Card.Content>
+                      </Card>
+                    </VStack>
+                  </ScrollView>
                 </>
               );
             }}

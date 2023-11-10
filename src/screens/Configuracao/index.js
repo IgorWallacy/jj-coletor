@@ -46,7 +46,7 @@ const ConfiguracaoComponent = ({ navigation }) => {
     <Box
       flex={1}
       alignItems="center"
-      justifyContent="center"
+      justifyContent="start"
       bg={{
         linearGradient: {
           colors: ["#eb575a", "#708090"],
@@ -54,7 +54,8 @@ const ConfiguracaoComponent = ({ navigation }) => {
           end: [0, 0],
         },
       }}
-      p="10"
+      p={2}
+      w="100%"
     >
       <Card style={{ width: "100%" }}>
         <Card.Title
