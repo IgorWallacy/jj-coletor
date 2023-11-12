@@ -70,6 +70,8 @@ const ConfiguracaoComponent = ({ navigation }) => {
             placeholder="Exemplo : 192.168.0.100"
             value={servidor}
             onChangeText={(text) => setServidor(text)}
+            autoCapitalize="none"
+            mode="outlined"
           />
         </Card.Content>
 

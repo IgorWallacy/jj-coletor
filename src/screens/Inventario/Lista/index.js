@@ -78,7 +78,6 @@ const ListaInventarios = ({ navigation }) => {
         <>
           <Box flexDirection="row-reverse">
             <Button
-              
               rounded="full"
               m={2}
               variant="solid"
@@ -152,8 +151,6 @@ const ListaInventarios = ({ navigation }) => {
                                 onPress={() =>
                                   navigation.navigate("nova-contagem", {
                                     itemId: parseInt(item?.id),
-                                    loja: item?.loja,
-                                    idfilial: item?.idfilial,
                                   })
                                 }
                               >

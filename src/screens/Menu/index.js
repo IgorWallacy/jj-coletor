@@ -35,7 +35,7 @@ const Menu = ({ navigation }) => {
   }, []);
   return (
     <Box
-      safeAreaTop="8"
+      safeAreaTop="1"
       flex={1}
       alignItems="center"
       justifyContent="center"

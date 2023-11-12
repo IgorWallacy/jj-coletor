@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { ProgressBar, MD3Colors } from "react-native-paper";
+import { ProgressBar, MD3Colors, TextInput } from "react-native-paper";
 import {
   Input,
   Box,
@@ -33,10 +33,29 @@ const NovaContagem = ({ route }) => {
   const [produto, setProduto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
-  const [loadinfgSalvar, setLoadingSalvar] = useState(false);
+  const [loadingSalvar, setLoadingSalvar] = useState(false);
 
   const [quantidade, setQuantidade] = useState(null);
   const [ean, setEan] = useState(null);
+
+  const [inventario, setInventario] = useState([]);
+
+  const getInventarios = () => {
+    return api
+      .get(
+        `/api/produto/contagem/inventarios/${JSON.stringify(
+          route.params.itemId
+        )} `
+      )
+      .then((r) => {
+        setInventario(r.data);
+       // console.log(r.data)
+      })
+      .catch((e) => {
+        Alert.alert("Erro", "Erro ao buscar dados dos inventário ");
+      })
+      .finally((f) => {});
+  };
 
   const getListProduto = () => {
     setLoading2(true);
@@ -48,7 +67,7 @@ const NovaContagem = ({ route }) => {
       )
       .then((r) => {
         setProdutoList(r.data);
-       // console.log(r.data)
+        // console.log(r.data)
       })
       .catch((e) => {
         alert(e?.message);
@@ -59,6 +78,8 @@ const NovaContagem = ({ route }) => {
   };
 
   useEffect(() => {
+    
+
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
@@ -68,6 +89,8 @@ const NovaContagem = ({ route }) => {
   }, []);
 
   useEffect(() => {
+    getInventarios();
+
     getListProduto();
 
     const getNomeUsuarioToken = async () => {
@@ -88,12 +111,7 @@ const NovaContagem = ({ route }) => {
     setScanned(null);
   };
 
-  if (hasPermission === null) {
-    return <Text>Requisitando acesso a câmera do dispositivo</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>Sem permissão de acesso a câmera do dispositivo</Text>;
-  }
+ 
 
   const getProduto = (data) => {
     setLoading(true);
@@ -111,37 +129,49 @@ const NovaContagem = ({ route }) => {
       .finally((f) => {
         setLoading(false);
         setEan(null);
+        getInventarios()
       });
   };
 
   const salvar = () => {
     //  console.log(produto);
-    setLoadingSalvar(true);
-    let q = parseFloat(quantidade.replace(",", "."));
-    return api
-      .post("/api/produto/contagem/salvar", {
-        idproduto: produto?.id,
-        idinventario: parseInt(JSON.stringify(route.params.itemId)),
-        produto: produto?.nome,
-        idfilial: parseInt(JSON.stringify(route.params.idfilial)),
-        quantidadeLida: q,
-        nomeUsuario: nomeUsuario,
-      })
-      .then((r) => {
-        Alert.alert(
-          "Sucesso",
-          `${produto?.ean} - ${produto?.nome}   adicionado`
-        );
-        setProduto(null);
-        setQuantidade(null);
-      })
-      .catch((e) => {
-        alert(e?.message);
-      })
-      .finally((f) => {
-        setLoadingSalvar(false);
-        getListProduto();
-      });
+    if (!inventario?.status ) {
+      Alert.alert(
+        "Inventário com status fechado",
+        `Solicite a abertura do inventário código ${JSON.stringify(
+          route.params.itemId
+        )} para iniciar a contagem `
+      );
+      getInventarios()
+    } else {
+      setLoadingSalvar(true);
+      let q = parseFloat(quantidade.replace(",", "."));
+      return api
+        .post("/api/produto/contagem/salvar", {
+          idproduto: produto?.id,
+          idinventario: parseInt(JSON.stringify(route.params.itemId)),
+          produto: produto?.nome,
+          idfilial: parseInt(JSON.stringify(route.params.idfilial)),
+          quantidadeLida: q,
+          nomeUsuario: nomeUsuario,
+        })
+        .then((r) => {
+          Alert.alert(
+            "Sucesso",
+            `${produto?.ean} - ${produto?.nome}   adicionado`
+          );
+          setProduto(null);
+          setQuantidade(null);
+        })
+        .catch((e) => {
+          alert(e?.message);
+        })
+        .finally((f) => {
+          setLoadingSalvar(false);
+          getInventarios()
+          getListProduto();
+        });
+    }
   };
 
   return (
@@ -209,9 +239,9 @@ const NovaContagem = ({ route }) => {
               </>
             ) : (
               <>
-                <Text fontSize="2xl" mx={2} color="white">
-                  Inventário#{JSON.stringify(route.params.itemId)} -
-                  {JSON.stringify(route.params.loja)}
+                <Text fontSize="2xl" m={2} color="white">
+                  Inventário #{inventario?.id} - {inventario?.nome} - 
+                  {inventario?.loja}
                 </Text>
                 <Box
                   flexDirection="row-reverse"
@@ -248,19 +278,18 @@ const NovaContagem = ({ route }) => {
                 >
                   {produto ? (
                     <>
-                      <Badge
-                      
-                       w="95%"
-                        h={16}
-                        mx="2"
-                        my="2"
-                        rounded="md"
-                      >
-                        <Box flex={1} w="100%" flexDirection="column" justifyContent="stretch" alignItems="center">
-                        <Text fontSize={10}>
+                      <Badge w="95%" h={16} mx="2" my="2" rounded="md">
+                        <Box
+                          flex={1}
+                          w="100%"
+                          flexDirection="column"
+                          justifyContent="stretch"
+                          alignItems="center"
+                        >
+                          <Text fontSize={10}>
                             {produto?.ean ? produto?.ean : produto?.codigo}
                           </Text>
-                          <Text fontSize={13} fontWeight="extrabold">
+                          <Text fontSize="md" fontWeight="extrabold">
                             {" "}
                             {produto?.nome}
                           </Text>
@@ -269,8 +298,6 @@ const NovaContagem = ({ route }) => {
                             {produto?.idUnidadeMedida?.codigo}
                           </Text>
                         </Box>
-                        
-                      
                       </Badge>
                     </>
                   ) : (
@@ -289,36 +316,44 @@ const NovaContagem = ({ route }) => {
                   behavior={Platform.OS == "ios" ? "padding" : "height"}
                   w="100%"
                 >
-                  <Box w="89%" justifyContent="center" alignItems="center">
+                  <Box w="95%" justifyContent="center" alignItems="center">
                     {produto ? (
                       <></>
                     ) : (
                       <>
-                        <Box w="100%" flexDirection="row">
-                          <Input
+                        <Box
+                          w="100%"
+                          flexDirection="row"
+                          justifyContent="center"
+                          alignItems="center"
+                          flexWrap="wrap"
+                          gap="10px"
+                        >
+                          <TextInput
                             onChangeText={(e) => setEan(e)}
                             id="ean"
                             size="2xl"
-                            bgColor="#f2f2f2"
-                            w="90%"
-                            placeholder="Digite o código ou cod.barras"
-                            mb={2}
+                            style={{ width: "75%" }}
+                            // placeholder="Digite o código ou cod.barras"
+                            label="Código ou código de barras"
                             keyboardType="numeric"
-                            rounded="md"
+                            mods="outlined"
                           />
                           <Button
                             rounded="full"
                             variant="solid"
                             onPress={() => getProduto()}
-                            ml={4}
+                            ml={8}
                             leftIcon={
                               <FontAwesome5
                                 name="search"
-                                size={26}
+                                size={18}
                                 color="white"
                               />
                             }
-                          ></Button>
+                          >
+                            Pesquisar
+                          </Button>
                         </Box>
                       </>
                     )}
@@ -351,6 +386,7 @@ const NovaContagem = ({ route }) => {
                           m="2"
                           rounded="full"
                           colorScheme="danger"
+                          disabled={loadingSalvar}
                           leftIcon={
                             <FontAwesome5
                               name="times"
@@ -362,7 +398,7 @@ const NovaContagem = ({ route }) => {
                           Cancelar
                         </Button>
                         <Button
-                          isLoading={loadinfgSalvar}
+                          isLoading={loadingSalvar}
                           isLoadingText="Salvando..."
                           disabled={!produto || !quantidade}
                           onPress={() => salvar()}
@@ -417,7 +453,7 @@ const NovaContagem = ({ route }) => {
                                       )
                                       .then((r) => {
                                         Alert.alert(
-                                          "Suceeso",
+                                          "Sucesso",
                                           `Produto ${
                                             item?.produto + " "
                                           } excluído`
@@ -426,6 +462,7 @@ const NovaContagem = ({ route }) => {
                                       })
                                       .catch((e) => {
                                         Alert.alert(
+                                          "Erro",
                                           "Erro ao excluir ",
                                           e?.message
                                         );
@@ -445,20 +482,21 @@ const NovaContagem = ({ route }) => {
                                   Código - {item?.ean}
                                 </ListItem.Subtitle>
                               </ListItem.Content>
-                              <Badge  backgroundColor={"green.500"}>
+                              <Badge backgroundColor={"green.500"}>
                                 <Text color="#ffff">Quantidade</Text>
                                 <Text
                                   fontSize="xl"
                                   fontWeight="bold"
                                   color="white"
                                 >
-                                 
                                   {Intl.NumberFormat("pt-BR", {
                                     minimumFractionDigits: "0",
                                     maximumFractionDigits: "3",
                                   }).format(item?.quantidadeLida)}
                                 </Text>
-                                <Text size={6} color="#ffff">{item?.unidadeMedida}</Text>
+                                <Text size={6} color="#ffff">
+                                  {item?.unidadeMedida}
+                                </Text>
                               </Badge>
                               <ListItem.Chevron />
                             </ListItem.Swipeable>

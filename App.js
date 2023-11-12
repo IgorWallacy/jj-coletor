@@ -3,11 +3,18 @@ import { NavigationContainer } from "@react-navigation/native";
 import "react-native-gesture-handler";
 import { NativeBaseProvider } from "native-base";
 import Routes from "./src/routes";
-import { PaperProvider } from 'react-native-paper';
+import { PaperProvider,DefaultTheme } from 'react-native-paper';
 import {LogBox} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 
 const App = () => {
+  const lightTheme = {
+    ...DefaultTheme,
+    dark: false,
+  };
+
+  const theme = lightTheme;
   useEffect(() => {
     LogBox.ignoreLogs(['In React 18, SSRProvider is not necessary and is a noop. You can remove it from your app.']);
   }, []);
@@ -23,8 +30,8 @@ const App = () => {
   return (
     <NavigationContainer>
       <NativeBaseProvider config={config}>
-      <PaperProvider>
-        
+      <PaperProvider theme={theme}>
+      <StatusBar style="light" />
         <Routes />
         </PaperProvider>
       </NativeBaseProvider>

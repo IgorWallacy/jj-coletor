@@ -136,10 +136,11 @@ export default function Login({ navigation }) {
             onChangeText={(e) => setUsuario(e)}
             keyboardType="email-address"
             type="text"
-            bgColor={"blue.100"}
+           
             size="2xl"
-            placeholder="Código"
+          
             label="Código"
+            mode="flat"
           />
         </Box>
         <Box m="1" w="100%">
@@ -149,9 +150,9 @@ export default function Login({ navigation }) {
             type="password"
             keyboardType="numbers-and-punctuation"
             secureTextEntry
-            bgColor={"blue.100"}
+           
             size="2xl"
-            placeholder="Senha"
+           
             label="Senha"
           />
         </Box>

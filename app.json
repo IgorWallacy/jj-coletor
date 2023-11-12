@@ -1,11 +1,15 @@
 {
   "expo": {
-    "name": "JJ-coletor",
+    "name": "JJ Coletor",
     "slug": "jj-coletor",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "androidStatusBar": {
+      "backgroundColor": "#708090",
+      "translucent": false
+    },
     "plugins": [
       [
         "expo-barcode-scanner",
@@ -51,7 +55,7 @@
         "android.permission.CAMERA"
       ],
       "package": "com.igorwallacy.doks.jjColetor",
-      "versionCode" : 7
+      "versionCode" : 8
       
     },
     "web": {
