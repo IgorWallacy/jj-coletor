@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { ProgressBar, MD3Colors, TextInput } from "react-native-paper";
+import { ProgressBar, MD3Colors, TextInput, Card } from "react-native-paper";
 import {
   Input,
   Box,
@@ -10,6 +10,7 @@ import {
   VStack,
   ScrollView,
   Badge,
+  Modal,
 } from "native-base";
 
 import { ListItem, Button as Button2 } from "@rneui/themed";
@@ -43,13 +44,13 @@ const NovaContagem = ({ route }) => {
   const getInventarios = () => {
     return api
       .get(
-        `/api/produto/contagem/inventarios/${JSON.stringify(
-          route.params.itemId
-        )} `
+        `/api/produto/contagem/inventarios/${parseInt(
+          JSON.stringify(route.params.itemId)
+        )}`
       )
       .then((r) => {
         setInventario(r.data);
-       // console.log(r.data)
+        // console.log(r.data)
       })
       .catch((e) => {
         Alert.alert("Erro", "Erro ao buscar dados dos inventário ");
@@ -61,8 +62,8 @@ const NovaContagem = ({ route }) => {
     setLoading2(true);
     return api
       .get(
-        `/api/produto/contagem/porInventario/mobile/${JSON.stringify(
-          route.params.itemId
+        `/api/produto/contagem/porInventario/mobile/${parseInt(
+          JSON.stringify(route.params.itemId)
         )}`
       )
       .then((r) => {
@@ -78,8 +79,6 @@ const NovaContagem = ({ route }) => {
   };
 
   useEffect(() => {
-    
-
     const getBarCodeScannerPermissions = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
@@ -111,8 +110,6 @@ const NovaContagem = ({ route }) => {
     setScanned(null);
   };
 
- 
-
   const getProduto = (data) => {
     setLoading(true);
     return api
@@ -129,48 +126,50 @@ const NovaContagem = ({ route }) => {
       .finally((f) => {
         setLoading(false);
         setEan(null);
-        getInventarios()
+        getInventarios();
       });
   };
 
   const salvar = () => {
     //  console.log(produto);
-    if (!inventario?.status ) {
+    if (!inventario?.status) {
       Alert.alert(
         "Inventário com status fechado",
-        `Solicite a abertura do inventário código ${JSON.stringify(
-          route.params.itemId
-        )} para iniciar a contagem `
+        `Solicite a abertura do inventário de código ${inventario?.id} - ${inventario?.nome} para iniciar a contagem `
       );
-      getInventarios()
+      getInventarios();
     } else {
-      setLoadingSalvar(true);
-      let q = parseFloat(quantidade.replace(",", "."));
-      return api
-        .post("/api/produto/contagem/salvar", {
-          idproduto: produto?.id,
-          idinventario: parseInt(JSON.stringify(route.params.itemId)),
-          produto: produto?.nome,
-          idfilial: parseInt(JSON.stringify(route.params.idfilial)),
-          quantidadeLida: q,
-          nomeUsuario: nomeUsuario,
-        })
-        .then((r) => {
-          Alert.alert(
-            "Sucesso",
-            `${produto?.ean} - ${produto?.nome}   adicionado`
-          );
-          setProduto(null);
-          setQuantidade(null);
-        })
-        .catch((e) => {
-          alert(e?.message);
-        })
-        .finally((f) => {
-          setLoadingSalvar(false);
-          getInventarios()
-          getListProduto();
-        });
+      if (!quantidade || !produto) {
+        Alert.alert("Aviso", "Informe a quantidade e/ou produto");
+      } else {
+        setLoadingSalvar(true);
+        let q = parseFloat(quantidade.replace(",", "."));
+        return api
+          .post("/api/produto/contagem/salvar", {
+            idproduto: produto?.id,
+            idinventario: inventario?.id,
+            produto: produto?.nome,
+            idfilial: inventario?.idfilial,
+            quantidadeLida: q,
+            nomeUsuario: nomeUsuario,
+          })
+          .then((r) => {
+            Alert.alert(
+              "Sucesso",
+              `${produto?.ean} - ${produto?.nome}   adicionado`
+            );
+            setProduto(null);
+            setQuantidade(null);
+          })
+          .catch((e) => {
+            alert(e?.message);
+          })
+          .finally((f) => {
+            setLoadingSalvar(false);
+            getInventarios();
+            getListProduto();
+          });
+      }
     }
   };
 
@@ -239,36 +238,50 @@ const NovaContagem = ({ route }) => {
               </>
             ) : (
               <>
-                <Text fontSize="2xl" m={2} color="white">
-                  Inventário #{inventario?.id} - {inventario?.nome} - 
-                  {inventario?.loja}
-                </Text>
-                <Box
-                  flexDirection="row-reverse"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Button
-                    w={16}
-                    rounded="full"
-                    mx={2}
-                    variant="solid"
-                    onPress={() => setOpenScanner(true)}
-                    rightIcon={
-                      <FontAwesome5 name="camera" size={20} color="white" />
-                    }
-                  />
-                  <Button
-                    w={16}
-                    rounded="full"
-                    mx={2}
-                    variant="solid"
-                    onPress={() => getListProduto()}
-                    rightIcon={
-                      <FontAwesome name="refresh" size={20} color="white" />
-                    }
-                  />
-                </Box>
+                {produto ? (
+                  <></>
+                ) : (
+                  <>
+                    <Card mode="elevated" marginTop={1}>
+                      <Card.Content>
+                        <Text fontSize="md" m={2} color="black">
+                          Inventário #{inventario?.id} - {inventario?.nome} -
+                          {inventario?.loja}
+                        </Text>
+                      </Card.Content>
+                    </Card>
+                  </>
+                )}
+                <Card mode="elevated" marginTop={5}>
+                  <Card.Content>
+                    <Box
+                      flexDirection="row-reverse"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Button
+                        w={16}
+                        rounded="full"
+                        mx={2}
+                        variant="solid"
+                        onPress={() => setOpenScanner(true)}
+                        rightIcon={
+                          <FontAwesome5 name="camera" size={20} color="white" />
+                        }
+                      />
+                      <Button
+                        w={16}
+                        rounded="full"
+                        mx={2}
+                        variant="solid"
+                        onPress={() => getListProduto()}
+                        rightIcon={
+                          <FontAwesome name="refresh" size={20} color="white" />
+                        }
+                      />
+                    </Box>
+                  </Card.Content>
+                </Card>
 
                 <Box
                   w="container"
@@ -278,7 +291,7 @@ const NovaContagem = ({ route }) => {
                 >
                   {produto ? (
                     <>
-                      <Badge w="95%" h={16} mx="2" my="2" rounded="md">
+                      <Badge w="95%" h={24} mx="2" my="1" >
                         <Box
                           flex={1}
                           w="100%"
@@ -286,14 +299,14 @@ const NovaContagem = ({ route }) => {
                           justifyContent="stretch"
                           alignItems="center"
                         >
-                          <Text fontSize={10}>
+                          <Text fontSize={12}>
                             {produto?.ean ? produto?.ean : produto?.codigo}
                           </Text>
-                          <Text fontSize="md" fontWeight="extrabold">
+                          <Text fontSize={18} fontWeight="extrabold">
                             {" "}
                             {produto?.nome}
                           </Text>
-                          <Text fontSize={10} fontWeight="extrabold">
+                          <Text fontSize={12} fontWeight="extrabold">
                             {" "}
                             {produto?.idUnidadeMedida?.codigo}
                           </Text>
@@ -312,22 +325,21 @@ const NovaContagem = ({ route }) => {
                   )}
                 </Box>
 
-                <KeyboardAvoidingView
-                  behavior={Platform.OS == "ios" ? "padding" : "height"}
-                  w="100%"
-                >
-                  <Box w="95%" justifyContent="center" alignItems="center">
+               
+                  <Box justifyContent="center" alignItems="center">
                     {produto ? (
                       <></>
                     ) : (
                       <>
+                      <Card width="100%">
+                        <Card.Content>
                         <Box
                           w="100%"
                           flexDirection="row"
                           justifyContent="center"
                           alignItems="center"
                           flexWrap="wrap"
-                          gap="10px"
+                         
                         >
                           <TextInput
                             onChangeText={(e) => setEan(e)}
@@ -340,10 +352,11 @@ const NovaContagem = ({ route }) => {
                             mods="outlined"
                           />
                           <Button
+                            mt={5}
+                            w="75%"
                             rounded="full"
                             variant="solid"
                             onPress={() => getProduto()}
-                            ml={8}
                             leftIcon={
                               <FontAwesome5
                                 name="search"
@@ -352,13 +365,18 @@ const NovaContagem = ({ route }) => {
                               />
                             }
                           >
-                            Pesquisar
+                            Adicionar novo produto por código
                           </Button>
                         </Box>
+
+                        </Card.Content>
+
+                      </Card>
+                       
                       </>
                     )}
                   </Box>
-                  <Box flexDirection="column" w={96} p={5}>
+                  <Box flexDirection="column" w={96} p={1}>
                     {produto ? (
                       <>
                         <Box>
@@ -400,7 +418,7 @@ const NovaContagem = ({ route }) => {
                         <Button
                           isLoading={loadingSalvar}
                           isLoadingText="Salvando..."
-                          disabled={!produto || !quantidade}
+                          // disabled={!produto || !quantidade}
                           onPress={() => salvar()}
                           h="12"
                           m="2"
@@ -419,7 +437,7 @@ const NovaContagem = ({ route }) => {
                       <></>
                     )}
                   </Box>
-                </KeyboardAvoidingView>
+               
                 {loading2 ? (
                   <>
                     <Box w="container">
@@ -440,7 +458,7 @@ const NovaContagem = ({ route }) => {
                         {produtoList.map((item, i) => (
                           <>
                             <ListItem.Swipeable
-                              key={item?.id ? item.id : i}
+                              key={i}
                               topDivider
                               rightContent={(reset) => (
                                 <Button2
@@ -476,7 +494,7 @@ const NovaContagem = ({ route }) => {
                                 />
                               )}
                             >
-                              <ListItem.Content key={i}>
+                              <ListItem.Content>
                                 <ListItem.Title>{item?.produto}</ListItem.Title>
                                 <ListItem.Subtitle>
                                   Código - {item?.ean}
@@ -511,6 +529,20 @@ const NovaContagem = ({ route }) => {
           </Box>
         )}
       </Box>
+      <Modal isOpen={loadingSalvar} onClose={() => setLoadingSalvar(false)} clos>
+        <Modal.Content>
+          
+          <Modal.Header> Aguarde por favor </Modal.Header>
+          <Modal.Body>
+            <Text> Gravando ....</Text>
+            <ProgressBar
+                        indeterminate
+                        progress={1}
+                        color={MD3Colors.success50}
+                      />
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
     </>
   );
 };
