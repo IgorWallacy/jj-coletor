@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
-import { ProgressBar, MD3Colors, TextInput, Card } from "react-native-paper";
+import {
+  ProgressBar,
+  MD3Colors,
+  TextInput,
+  Card,
+  Text as TextNP,
+} from "react-native-paper";
 import {
   Input,
   Box,
   Text,
   Button,
-  KeyboardAvoidingView,
   VStack,
   ScrollView,
   Badge,
@@ -22,6 +27,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import api from "../../../service/axios";
 import { Alert } from "react-native";
+import moment from "moment";
 
 const NovaContagem = ({ route }) => {
   const [nomeUsuario, setNomeUsuario] = useState(null);
@@ -41,6 +47,10 @@ const NovaContagem = ({ route }) => {
 
   const [inventario, setInventario] = useState([]);
 
+  const rowsProduto = useRef(3);
+
+  const refBarras = useRef(null);
+
   const getInventarios = () => {
     return api
       .get(
@@ -58,13 +68,19 @@ const NovaContagem = ({ route }) => {
       .finally((f) => {});
   };
 
+  const carregarMaisProdutos = () => {
+    rowsProduto.current = rowsProduto.current + 10;
+
+    getListProduto();
+  };
+
   const getListProduto = () => {
     setLoading2(true);
     return api
       .get(
         `/api/produto/contagem/porInventario/mobile/${parseInt(
           JSON.stringify(route.params.itemId)
-        )}`
+        )}/${rowsProduto.current}`
       )
       .then((r) => {
         setProdutoList(r.data);
@@ -106,7 +122,7 @@ const NovaContagem = ({ route }) => {
     setOpenScanner(false);
     //  alert(`Código ${data} lido com sucesso!`);
     getProduto(data);
-
+    refBarras.current = data;
     setScanned(null);
   };
 
@@ -126,18 +142,17 @@ const NovaContagem = ({ route }) => {
       .finally((f) => {
         setLoading(false);
         setEan(null);
-        getInventarios();
       });
   };
 
   const salvar = () => {
     //  console.log(produto);
+    getInventarios();
     if (!inventario?.status) {
       Alert.alert(
         "Inventário com status fechado",
         `Solicite a abertura do inventário de código ${inventario?.id} - ${inventario?.nome} para iniciar a contagem `
       );
-      getInventarios();
     } else {
       if (!quantidade || !produto) {
         Alert.alert("Aviso", "Informe a quantidade e/ou produto");
@@ -154,21 +169,20 @@ const NovaContagem = ({ route }) => {
             nomeUsuario: nomeUsuario,
           })
           .then((r) => {
+            setProduto(null);
+            setQuantidade(null);
             Alert.alert(
               "Sucesso",
               `${produto?.ean} - ${produto?.nome}   adicionado`
             );
-            setProduto(null);
-            setQuantidade(null);
+            setLoadingSalvar(false);
+            rowsProduto.current = 3;
+            getListProduto();
           })
           .catch((e) => {
             alert(e?.message);
           })
-          .finally((f) => {
-            setLoadingSalvar(false);
-            getInventarios();
-            getListProduto();
-          });
+          .finally((f) => {});
       }
     }
   };
@@ -190,6 +204,15 @@ const NovaContagem = ({ route }) => {
       >
         {openScanner === true ? (
           <Box w="100%" h="50%">
+            <TextNP
+              variant="headlineMedium"
+              style={{
+                fontWeight: "bold",
+                color: "#ffff",
+              }}
+            >
+              Aproxime o código de barras para leitura
+            </TextNP>
             <BarCodeScanner
               onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
               style={{
@@ -225,15 +248,22 @@ const NovaContagem = ({ route }) => {
           <Box>
             {loading ? (
               <>
-                <Box w="container">
-                  <Text color="#f2f2f2" fontSize="2xl">
-                    Consultando
-                  </Text>
-                  <ProgressBar
-                    indeterminate
-                    progress={1}
-                    color={MD3Colors.success50}
-                  />
+                <Box
+                  w="container"
+                  flex={1}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Box>
+                    <Text color="#f2f2f2" fontSize="2xl">
+                      Consultando código {ean ? ean : refBarras.current}
+                    </Text>
+                    <ProgressBar
+                      indeterminate
+                      progress={1}
+                      color={MD3Colors.success50}
+                    />
+                  </Box>
                 </Box>
               </>
             ) : (
@@ -269,6 +299,7 @@ const NovaContagem = ({ route }) => {
                           <FontAwesome5 name="camera" size={20} color="white" />
                         }
                       />
+                      <TextNP> {inventario?.status ? 'Aberto' : 'Fechado '} - Início {moment(inventario?.inicio).format("DD/MM/YYYY hh:mm:ss")}</TextNP>
                       <Button
                         w={16}
                         rounded="full"
@@ -291,7 +322,7 @@ const NovaContagem = ({ route }) => {
                 >
                   {produto ? (
                     <>
-                      <Badge w="95%" h={24} mx="2" my="1" >
+                      <Badge w="95%" h={24} mx="2" my="1">
                         <Box
                           flex={1}
                           w="100%"
@@ -325,119 +356,110 @@ const NovaContagem = ({ route }) => {
                   )}
                 </Box>
 
-               
-                  <Box justifyContent="center" alignItems="center">
-                    {produto ? (
-                      <></>
-                    ) : (
-                      <>
+                <Box justifyContent="center" alignItems="center">
+                  {produto ? (
+                    <></>
+                  ) : (
+                    <>
                       <Card width="100%">
                         <Card.Content>
-                        <Box
-                          w="100%"
-                          flexDirection="row"
-                          justifyContent="center"
-                          alignItems="center"
-                          flexWrap="wrap"
-                         
-                        >
-                          <TextInput
-                            onChangeText={(e) => setEan(e)}
-                            id="ean"
-                            size="2xl"
-                            style={{ width: "75%" }}
-                            // placeholder="Digite o código ou cod.barras"
-                            label="Código ou código de barras"
-                            keyboardType="numeric"
-                            mods="outlined"
-                          />
-                          <Button
-                            mt={5}
-                            w="75%"
-                            rounded="full"
-                            variant="solid"
-                            onPress={() => getProduto()}
-                            leftIcon={
-                              <FontAwesome5
-                                name="search"
-                                size={18}
-                                color="white"
-                              />
-                            }
+                          <Box
+                            w="100%"
+                            flexDirection="row"
+                            justifyContent="center"
+                            alignItems="center"
+                            flexWrap="wrap"
                           >
-                            Adicionar novo produto por código
-                          </Button>
-                        </Box>
-
-                        </Card.Content>
-
-                      </Card>
-                       
-                      </>
-                    )}
-                  </Box>
-                  <Box flexDirection="column" w={96} p={1}>
-                    {produto ? (
-                      <>
-                        <Box>
-                          <Input
-                            w="container"
-                            onChangeText={(e) => setQuantidade(e)}
-                            id="quantidade"
-                            clearTextOnFocus
-                            size="2xl"
-                            bgColor="#f2f2f2"
-                            m="2"
-                            placeholder="Quantidade #0,00"
-                            keyboardType="decimal-pad"
-                            rounded="md"
-                            autoCapitalize="words"
-                          />
-                        </Box>
-
-                        <Button
-                          onPress={(e) => {
-                            setProduto(null);
-                            setQuantidade(null);
-                          }}
-                          h="12"
-                          m="2"
-                          rounded="full"
-                          colorScheme="danger"
-                          disabled={loadingSalvar}
-                          leftIcon={
-                            <FontAwesome5
-                              name="times"
-                              size={18}
-                              color="white"
+                            <TextInput
+                              onChangeText={(e) => setEan(e)}
+                              id="ean"
+                              size="2xl"
+                              style={{ width: "75%" }}
+                              // placeholder="Digite o código ou cod.barras"
+                              label="Código ou código de barras"
+                              keyboardType="numeric"
+                              mods="outlined"
                             />
-                          }
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          isLoading={loadingSalvar}
-                          isLoadingText="Salvando..."
-                          // disabled={!produto || !quantidade}
-                          onPress={() => salvar()}
-                          h="12"
+                            <Button
+                              mt={5}
+                              w="75%"
+                              rounded="full"
+                              variant="solid"
+                              onPress={() => getProduto()}
+                              leftIcon={
+                                <FontAwesome5
+                                  name="search"
+                                  size={18}
+                                  color="white"
+                                />
+                              }
+                            >
+                              Adicionar novo produto por código
+                            </Button>
+                          </Box>
+                        </Card.Content>
+                      </Card>
+                    </>
+                  )}
+                </Box>
+                <Box flexDirection="column" w={96} p={1}>
+                  {produto ? (
+                    <>
+                      <Box>
+                        <Input
+                          w="container"
+                          onChangeText={(e) => setQuantidade(e)}
+                          id="quantidade"
+                          clearTextOnFocus
+                          size="2xl"
+                          bgColor="#f2f2f2"
                           m="2"
-                          rounded="full"
-                          colorScheme="success"
-                          rightIcon={
-                            <FontAwesome5 name="plus" size={18} color="white" />
-                          }
-                        >
-                          <Text fontWeight="bold" fontSize="lg" color="#ffff">
-                            Adicionar
-                          </Text>
-                        </Button>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </Box>
-               
+                          placeholder="Quantidade #0,00"
+                          keyboardType="decimal-pad"
+                          rounded="md"
+                          autoCapitalize="words"
+                        />
+                      </Box>
+
+                      <Button
+                        onPress={(e) => {
+                          setProduto(null);
+                          setQuantidade(null);
+                        }}
+                        h="12"
+                        m="2"
+                        rounded="full"
+                        colorScheme="danger"
+                        disabled={loadingSalvar}
+                        leftIcon={
+                          <FontAwesome5 name="times" size={18} color="white" />
+                        }
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        isLoading={loadingSalvar}
+                        isLoadingText="Salvando..."
+                        // disabled={!produto || !quantidade}
+                        onPress={() => salvar()}
+                        h="12"
+                        m="2"
+                        rounded="full"
+                        colorScheme="success"
+                        rightIcon={
+                          <FontAwesome5 name="plus" size={18} color="white" />
+                        }
+                      >
+                        <Text fontWeight="bold" fontSize="lg" color="#ffff">
+                          Adicionar
+                        </Text>
+                      </Button>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </Box>
+
                 {loading2 ? (
                   <>
                     <Box w="container">
@@ -458,7 +480,8 @@ const NovaContagem = ({ route }) => {
                         {produtoList.map((item, i) => (
                           <>
                             <ListItem.Swipeable
-                              key={i}
+                              keyExtractor={(p) => p?.id}
+                              initialNumToRender={rowsProduto.current}
                               topDivider
                               rightContent={(reset) => (
                                 <Button2
@@ -522,6 +545,11 @@ const NovaContagem = ({ route }) => {
                         ))}
                       </VStack>
                     </ScrollView>
+
+                    <Button2
+                      title={`Exibindo o(s) ${produtoList?.length} último(s) produto(s) adicionado(s). Clique para ver mais`}
+                      onPress={() => carregarMaisProdutos()}
+                    />
                   </>
                 )}
               </>
@@ -529,17 +557,26 @@ const NovaContagem = ({ route }) => {
           </Box>
         )}
       </Box>
-      <Modal isOpen={loadingSalvar} onClose={() => setLoadingSalvar(false)} clos>
-        <Modal.Content>
-          
+      <Modal
+        isOpen={loadingSalvar}
+        onClose={() => setLoadingSalvar(false)}
+        clos
+      >
+        <Modal.Content
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Modal.Header> Aguarde por favor </Modal.Header>
           <Modal.Body>
-            <Text> Gravando ....</Text>
+            <TextNP variant="titleMedium"> Gravando </TextNP>
             <ProgressBar
-                        indeterminate
-                        progress={1}
-                        color={MD3Colors.success50}
-                      />
+              indeterminate
+              progress={1}
+              color={MD3Colors.success50}
+            />
           </Modal.Body>
         </Modal.Content>
       </Modal>

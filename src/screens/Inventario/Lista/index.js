@@ -8,11 +8,14 @@ import {
   ScrollView,
 } from "native-base";
 
+import { DatePickerInput, pt } from "react-native-paper-dates";
+
 import {
   ProgressBar,
   MD3Colors,
   Card,
   Text as TextP,
+  TextInput,
 } from "react-native-paper";
 
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
@@ -20,17 +23,27 @@ import { useEffect, useState } from "react";
 import api from "../../../service/axios";
 import moment from "moment";
 import "moment/locale/pt-br";
+import { enGB, registerTranslation } from "react-native-paper-dates";
 
 moment.locale("pt-br");
+registerTranslation("pt", pt);
 
 const ListaInventarios = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [inventarioList, setInventarioList] = useState([]);
+  const [inicio, setInicio] = useState();
 
   const getInventario = () => {
+
+    if(inicio) {
+
     setLoading(true);
+   
+
     return api
-      .get("/api/produto/contagem/inventarios")
+      .get(
+        `/api/produto/contagem/inventarios/porData/${moment(inicio).format("YYYY-MM-DD")}`
+      )
       .then((r) => {
         // console.log(r.data)
         setInventarioList(r.data);
@@ -41,9 +54,27 @@ const ListaInventarios = ({ navigation }) => {
       .finally((f) => {
         setLoading(false);
       });
-  };
+  } else {
+    return api
+    .get(
+      `/api/produto/contagem/inventarios/porData/${moment().format("YYYY-MM-DD")}`
+    )
+    .then((r) => {
+      // console.log(r.data)
+      setInventarioList(r.data);
+    })
+    .catch((e) => {
+      alert(e?.message);
+    })
+    .finally((f) => {
+      setLoading(false);
+    });
+
+  }
+};
 
   useEffect(() => {
+   
     getInventario();
   }, []);
 
@@ -76,16 +107,30 @@ const ListaInventarios = ({ navigation }) => {
         </>
       ) : (
         <>
-          <Box flexDirection="row-reverse">
-            <Button
-              rounded="full"
-              m={2}
-              variant="solid"
-              onPress={() => getInventario()}
-              rightIcon={<FontAwesome name="refresh" size={28} color="white" />}
-            >
-              Recarregar
-            </Button>
+          <Box flexDirection="row" flexWrap="wrap" w="container" m={2}>
+            <DatePickerInput
+              locale="pt"
+              label="Início do inventário"
+              value={inicio}
+              onChange={(d) => setInicio(d)}
+              inputMode="start"
+            />
+          </Box>
+
+          <Box flexDirection="column" w="container">
+            <Box>
+              <Button
+                rounded="full"
+                m={2}
+                variant="solid"
+                onPress={() => getInventario()}
+                rightIcon={
+                  <FontAwesome name="filter" size={20} color="white" />
+                }
+              >
+                Pesquisar
+              </Button>
+            </Box>
           </Box>
           <FlatList
             data={inventarioList}

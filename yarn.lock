@@ -6679,6 +6679,13 @@ react-native-gesture-handler@~2.13.0:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-paper-dates@^0.20.5:
+  version "0.20.5"
+  resolved "https://registry.yarnpkg.com/react-native-paper-dates/-/react-native-paper-dates-0.20.5.tgz#889ef1fcd89f0a9df79d89c63e0cdc6dc6301c53"
+  integrity sha512-8FSA/+WBJndjsWUcVBy6/OLX2q7qOV+6CYyLjixaiRRZAXR9xcCU491keHANlCaj5Pjo8ovvOPlPnOvpfAgr3w==
+  dependencies:
+    color "^3.2.1"
+
 react-native-paper@^5.11.1:
   version "5.11.1"
   resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-5.11.1.tgz#34f612d6fb28099334db08a1bd109086ea91dcac"

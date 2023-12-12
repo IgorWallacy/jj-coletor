@@ -2,7 +2,7 @@
   "expo": {
     "name": "JJ Coletor",
     "slug": "jj-coletor",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -14,7 +14,7 @@
       [
         "expo-barcode-scanner",
         {
-          "cameraPermission": "Permitir $(PRODUCT_NAME) acessar a câmera."
+          "cameraPermission": "Permitir $(PRODUCT_NAME) acessar a câmera para leitura de codigos de barra."
         }
         
       ],
@@ -55,7 +55,7 @@
         "android.permission.CAMERA"
       ],
       "package": "com.igorwallacy.doks.jjColetor",
-      "versionCode" : 9
+      "versionCode" : 10
       
     },
     "web": {
