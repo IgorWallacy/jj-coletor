@@ -200,7 +200,8 @@ const NovaContagem = ({ route }) => {
             end: [0, 0],
           },
         }}
-        p={1}
+        px={2}
+        
       >
         {openScanner === true ? (
           <Box w="100%" h="50%">
@@ -224,7 +225,7 @@ const NovaContagem = ({ route }) => {
             <Button
               colorScheme="danger"
               rounded="xl"
-              mt="4"
+              mt="1"
               onPress={() => {
                 setScanned(false);
                 setOpenScanner(false);
@@ -272,7 +273,7 @@ const NovaContagem = ({ route }) => {
                   <></>
                 ) : (
                   <>
-                    <Card mode="elevated" marginTop={1}>
+                    <Card mode="elevated">
                       <Card.Content>
                         <Text fontSize="md" m={2} color="black">
                           Inventário #{inventario?.id} - {inventario?.nome} -
@@ -315,15 +316,17 @@ const NovaContagem = ({ route }) => {
                 </Card>
 
                 <Box
-                  w="container"
+                  mx={5}
                   flexDirection="row"
                   justifyContent="center"
                   alignItems="center"
+                  
                 >
                   {produto ? (
                     <>
-                      <Badge w="95%" h={24} mx="2" my="1">
+                      <Badge w="95%" h={24} mx={2} my={1} p={1}>
                         <Box
+                          
                           flex={1}
                           w="100%"
                           flexDirection="column"
@@ -402,7 +405,7 @@ const NovaContagem = ({ route }) => {
                     </>
                   )}
                 </Box>
-                <Box flexDirection="column" w={96} p={1}>
+                <Box flexDirection="column" w="container" p={1} mx={4}>
                   {produto ? (
                     <>
                       <Box>
@@ -476,7 +479,7 @@ const NovaContagem = ({ route }) => {
                 ) : (
                   <>
                     <ScrollView>
-                      <VStack w="container" my={2}>
+                      <VStack w="container" my={2} p={4}>
                         {produtoList.map((item, i) => (
                           <>
                             <ListItem.Swipeable
@@ -544,12 +547,13 @@ const NovaContagem = ({ route }) => {
                           </>
                         ))}
                       </VStack>
-                    </ScrollView>
-
-                    <Button2
+                      <Button2
                       title={`Exibindo o(s) ${produtoList?.length} último(s) produto(s) adicionado(s). Clique para ver mais`}
                       onPress={() => carregarMaisProdutos()}
                     />
+                    </ScrollView>
+
+                   
                   </>
                 )}
               </>
