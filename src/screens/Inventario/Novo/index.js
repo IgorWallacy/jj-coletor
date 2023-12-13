@@ -49,8 +49,6 @@ const NovaContagem = ({ route }) => {
 
   const rowsProduto = useRef(3);
 
-  const refBarras = useRef(null);
-
   const getInventarios = () => {
     return api
       .get(
@@ -122,7 +120,7 @@ const NovaContagem = ({ route }) => {
     setOpenScanner(false);
     //  alert(`Código ${data} lido com sucesso!`);
     getProduto(data);
-    refBarras.current = data;
+
     setScanned(null);
   };
 
@@ -132,7 +130,10 @@ const NovaContagem = ({ route }) => {
       .get(`/api/produto/ean/${ean ? ean : data}`)
       .then((r) => {
         r?.data?.length === 0
-          ? Alert.alert("Aviso", "Nenhum produto encontrado")
+          ? Alert.alert(
+              "Aviso",
+              `Nenhum produto encontrado para o código ${ean ? ean : data}`
+            )
           : setProduto(r.data);
         //  console.log(r.data)
       })
@@ -189,151 +190,17 @@ const NovaContagem = ({ route }) => {
 
   return (
     <>
-      <Box
-        flex={1}
-        alignItems="center"
-        //   justifyContent="flex-start"
-        bg={{
-          linearGradient: {
-            colors: ["#eb575a", "#708090"],
-            start: [1, 0],
-            end: [0, 0],
-          },
-        }}
-        px={2}
-        
-      >
-        {openScanner === true ? (
-          <Box w="100%" h="50%">
-            <TextNP
-              variant="headlineMedium"
-              style={{
-                fontWeight: "bold",
-                color: "#ffff",
-              }}
-            >
-              Aproxime o código de barras para leitura
-            </TextNP>
-            <BarCodeScanner
-              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-              style={{
-                height: 600,
-                width: "100%",
-              }}
-            />
-
-            <Button
-              colorScheme="danger"
-              rounded="xl"
-              mt="1"
-              onPress={() => {
-                setScanned(false);
-                setOpenScanner(false);
-                setProduto("");
-              }}
-              leftIcon={
-                <FontAwesome5 name="backward" size={24} color="white" />
-              }
-            >
-              Cancelar
-            </Button>
-
-            {scanned === true && (
-              <Button onPress={() => setScanned(false)}>
-                {" "}
-                Clique para tentar novamente{" "}
-              </Button>
-            )}
-          </Box>
-        ) : (
-          <Box>
-            {loading ? (
-              <>
-                <Box
-                  w="container"
-                  flex={1}
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Box>
-                    <Text color="#f2f2f2" fontSize="2xl">
-                      Consultando código {ean ? ean : refBarras.current}
-                    </Text>
-                    <ProgressBar
-                      indeterminate
-                      progress={1}
-                      color={MD3Colors.success50}
-                    />
-                  </Box>
-                </Box>
-              </>
-            ) : (
-              <>
-                {produto ? (
-                  <></>
-                ) : (
-                  <>
-                    <Card mode="elevated">
-                      <Card.Content>
-                        <Text fontSize="md" m={2} color="black">
-                          Inventário #{inventario?.id} - {inventario?.nome} -
-                          {inventario?.loja}
-                        </Text>
-                      </Card.Content>
-                    </Card>
-                  </>
-                )}
-                <Card mode="elevated" marginTop={5}>
-                  <Card.Content>
-                    <Box
-                      flexDirection="row-reverse"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Button
-                        w={16}
-                        rounded="full"
-                        mx={2}
-                        variant="solid"
-                        onPress={() => setOpenScanner(true)}
-                        rightIcon={
-                          <FontAwesome5 name="camera" size={20} color="white" />
-                        }
-                      />
-                      <TextNP> {inventario?.status ? 'Aberto' : 'Fechado '} - Início {moment(inventario?.inicio).format("DD/MM/YYYY hh:mm:ss")}</TextNP>
-                      <Button
-                        w={16}
-                        rounded="full"
-                        mx={2}
-                        variant="solid"
-                        onPress={() => getListProduto()}
-                        rightIcon={
-                          <FontAwesome name="refresh" size={20} color="white" />
-                        }
-                      />
-                    </Box>
-                  </Card.Content>
-                </Card>
-
-                <Box
-                  mx={5}
-                  flexDirection="row"
-                  justifyContent="center"
-                  alignItems="center"
-                  
-                >
-                  {produto ? (
+    {produto ? (
                     <>
-                      <Badge w="95%" h={24} mx={2} my={1} p={1}>
+                      
                         <Box
-                          
-                          flex={1}
-                          w="100%"
+                          bgColor="#f3f3f3"
                           flexDirection="column"
-                          justifyContent="stretch"
+                          width="100%"
+                          marginTop={5}
                           alignItems="center"
                         >
-                          <Text fontSize={12}>
+                          <Text fontSize={16}>
                             {produto?.ean ? produto?.ean : produto?.codigo}
                           </Text>
                           <Text fontSize={18} fontWeight="extrabold">
@@ -345,78 +212,18 @@ const NovaContagem = ({ route }) => {
                             {produto?.idUnidadeMedida?.codigo}
                           </Text>
                         </Box>
-                      </Badge>
-                    </>
-                  ) : (
-                    <>
-                      <Text
-                        color="#fff"
-                        fontWeight="bold"
-                        fontSize="15"
-                        w="80%"
-                      ></Text>
-                    </>
-                  )}
-                </Box>
 
-                <Box justifyContent="center" alignItems="center">
-                  {produto ? (
-                    <></>
-                  ) : (
-                    <>
-                      <Card width="100%">
-                        <Card.Content>
-                          <Box
-                            w="100%"
-                            flexDirection="row"
-                            justifyContent="center"
-                            alignItems="center"
-                            flexWrap="wrap"
-                          >
-                            <TextInput
-                              onChangeText={(e) => setEan(e)}
-                              id="ean"
-                              size="2xl"
-                              style={{ width: "75%" }}
-                              // placeholder="Digite o código ou cod.barras"
-                              label="Código ou código de barras"
-                              keyboardType="numeric"
-                              mods="outlined"
-                            />
-                            <Button
-                              mt={5}
-                              w="75%"
-                              rounded="full"
-                              variant="solid"
-                              onPress={() => getProduto()}
-                              leftIcon={
-                                <FontAwesome5
-                                  name="search"
-                                  size={18}
-                                  color="white"
-                                />
-                              }
-                            >
-                              Adicionar novo produto por código
-                            </Button>
-                          </Box>
-                        </Card.Content>
-                      </Card>
-                    </>
-                  )}
-                </Box>
-                <Box flexDirection="column" w="container" p={1} mx={4}>
-                  {produto ? (
-                    <>
-                      <Box>
-                        <Input
-                          w="container"
+                        <Box flexDirection="column"  w="container" p={1} m={4}>
+                 
+                      
+                        <TextInput
+                          w="100%"
                           onChangeText={(e) => setQuantidade(e)}
                           id="quantidade"
                           clearTextOnFocus
                           size="2xl"
-                          bgColor="#f2f2f2"
-                          m="2"
+                         
+                          marginTop={5}
                           placeholder="Quantidade #0,00"
                           keyboardType="decimal-pad"
                           rounded="md"
@@ -430,7 +237,7 @@ const NovaContagem = ({ route }) => {
                           setQuantidade(null);
                         }}
                         h="12"
-                        m="2"
+                        m={5}
                         rounded="full"
                         colorScheme="danger"
                         disabled={loadingSalvar}
@@ -457,11 +264,182 @@ const NovaContagem = ({ route }) => {
                           Adicionar
                         </Text>
                       </Button>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+                      </>
+                    ):(<></>)}  
+      <Box
+        flexDir="row"
+        justifyContent="center"
+        alignItems="center"
+        flexWrap="wrap"
+        flex={1}
+        bg="#778899"
+        p={1}
+      >
+
+        
+        {openScanner === true ? (
+          <Box
+          flexWrap="wrap"
+            justifyContent="center"
+            flexDirection="row"
+            alignItems="center"
+           w={100}
+           h={100}
+           flex={1}
+          >
+            <TextNP
+              variant="headlineMedium"
+              style={{
+                fontWeight: "bold",
+                color: "#ffff",
+              }}
+            >
+              Aproxime o código de barras para leitura
+            </TextNP>
+            <BarCodeScanner
+              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+              style={{
+                height: 200,
+                width: "100%",
+              }}
+            />
+
+            <Button
+              colorScheme="danger"
+              rounded="xl"
+              mt="1"
+              w="100%"
+              onPress={() => {
+                setScanned(false);
+                setOpenScanner(false);
+                setProduto("");
+              }}
+              leftIcon={
+                <FontAwesome5 name="backward" size={24} color="white" />
+              }
+            >
+              Cancelar
+            </Button>
+
+            {scanned === true && (
+              <Button onPress={() => setScanned(false)}>
+                {" "}
+                Clique para tentar novamente{" "}
+              </Button>
+            )}
+          </Box>
+        ) : (
+          <Box>
+            {loading ? (
+              <>
+                <Box flex={1} justifyContent="center" alignItems="center">
+                  <Box>
+                    <Text color="#f2f2f2" fontSize="2xl">
+                      Consultando código
+                    </Text>
+                    <ProgressBar
+                      indeterminate
+                      progress={1}
+                      color={MD3Colors.success50}
+                    />
+                  </Box>
                 </Box>
+              </>
+            ) : (
+              <>
+
+              
+                
+                {produto? <></> : <>
+                <Box my={1}>
+                <Card mode="elevated"  >
+                      <Card.Content>
+                      <Box flexDirection="row" mx={1} px={1} alignItems="center" justifyContent="space-around">
+                        <Text fontSize="md" color="black">
+                          Inventário #{inventario?.id}  {inventario?.nome} {" "}
+                          {inventario?.loja} 
+                        </Text>
+                        </Box>
+                     
+                    <Box  flexDirection="row-reverse" mx={1} px={1} alignItems="center" justifyContent="space-around">
+                      <Button
+                        rounded="full"
+                        
+                        variant="solid"
+                        onPress={() => setOpenScanner(true)}
+                        rightIcon={
+                          <FontAwesome5 name="camera" size={30} color="white" />
+                        }
+                      />
+                      <TextNP>
+                        {" "}
+                        {inventario?.status ? "Aberto " : "Fechado "} 
+                        {moment(inventario?.inicio).format(
+                          "DD/MM/YYYY hh:mm:ss"
+                        )}
+                      </TextNP>
+                      <Button
+                        rounded="full"
+                        variant="solid"
+                        onPress={() => getListProduto()}
+                        rightIcon={
+                          <FontAwesome name="refresh" size={25} color="white" />
+                        }
+                      />
+                    </Box>
+              
+                          <Box
+                            w="100%"
+                            flexDirection="row"
+                            justifyContent="center"
+                            alignItems="center"
+                            flexWrap="wrap"
+                            my={5}
+                          >
+                            <TextInput
+                              onChangeText={(e) => setEan(e)}
+                              id="ean"
+                              
+                              size="2xl"
+                              style={{ width: "100%" }}
+                              // placeholder="Digite o código ou cod.barras"
+                              label="Código ou código de barras"
+                              keyboardType="numeric"
+                              mods="outlined"
+                            />
+                            <Button
+                              mt={5}
+                              w="85%"
+                              rounded="full"
+                              variant="solid"
+                              onPress={() => getProduto()}
+                              leftIcon={
+                                <FontAwesome5
+                                  name="search"
+                                  size={18}
+                                  color="white"
+                                />
+                              }
+                            >
+                              Adicionar novo produto por código
+                            </Button>
+                          </Box>
+                        </Card.Content>
+                      </Card>
+                </Box>
+                </>}
+                
+                  
+                  
+                
+                     
+                   
+                
+
+                
+                  
+                
+                
 
                 {loading2 ? (
                   <>
@@ -478,8 +456,9 @@ const NovaContagem = ({ route }) => {
                   </>
                 ) : (
                   <>
+                  {!produto ? (
                     <ScrollView>
-                      <VStack w="container" my={2} p={4}>
+                      <VStack my={1} p={1}>
                         {produtoList.map((item, i) => (
                           <>
                             <ListItem.Swipeable
@@ -548,19 +527,32 @@ const NovaContagem = ({ route }) => {
                         ))}
                       </VStack>
                       <Button2
-                      title={`Exibindo o(s) ${produtoList?.length} último(s) produto(s) adicionado(s). Clique para ver mais`}
-                      onPress={() => carregarMaisProdutos()}
-                    />
+                        title={`Exibindo o(s) ${produtoList?.length} último(s) produto(s) adicionado(s). Clique para ver mais`}
+                        onPress={() => carregarMaisProdutos()}
+                      />
                     </ScrollView>
-
-                   
+                  ) : (<></>)}
                   </>
                 )}
               </>
             )}
           </Box>
         )}
+
+
+
+
       </Box>
+
+
+
+                              
+      
+                   
+                    
+                    
+
+
       <Modal
         isOpen={loadingSalvar}
         onClose={() => setLoadingSalvar(false)}

@@ -14,7 +14,7 @@ export default function Routes() {
   return (
     <Stack.Navigator
       initialRouteName="Login"
-      screenOptions={{ headerShown: true }}
+      screenOptions={{ headerShown: true  }}
     >
       <Stack.Screen
         component={Login}
@@ -73,6 +73,7 @@ export default function Routes() {
         component={NovaContagem}
         name="nova-contagem"
         options={{
+          headerBackTitle : "Voltar",
           title: "Iniciar a coleta de produtos",
           headerStyle: {
             backgroundColor: "#708090",
