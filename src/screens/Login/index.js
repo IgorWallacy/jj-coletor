@@ -8,7 +8,7 @@ import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Text, Box, Button, Image, KeyboardAvoidingView } from "native-base";
-import { Platform, Alert } from "react-native";
+import { Platform, Alert, ImageBackground } from "react-native";
 import { TextInput } from "react-native-paper";
 
 export default function Login({ navigation }) {
@@ -96,16 +96,11 @@ export default function Login({ navigation }) {
     behavior={Platform.OS == "ios" ? "padding" : "height"}
     w="100%"
   >
-    <Image
-        source={require("../../../assets/images/logo_jj.png")}
-        alt="Logo"
-       width="100%"
-       height={130}
-      />
+    
      
       
      
-      
+   
       
     <Box
       flex={1}
@@ -120,16 +115,21 @@ export default function Login({ navigation }) {
       }}
       
       width="100%"
-      p={5}
+      padding={5}
     >
       
-      
+      <ImageBackground
+      resizeMode="contain"
+        source={require("../../../assets/images/logo_login.png")}
+        alt="Logo"
+        style={{ flex : 1, width: '100%', height: '100%'}}
+      ></ImageBackground>
       
       <Text fontSize="md" m="0.5" color="#FFFF">
         Informe sua conta uniplus
       </Text>
      
-        <Box m="1" w="100%">
+        <Box m={2} w="100%">
           <TextInput
             onFocus={() => getBaseURLAsyncStorage()}
             value={usuario}
@@ -182,7 +182,7 @@ export default function Login({ navigation }) {
       >
         JJ Coletor
       </Text>
-        <Text color="#f2f2f2"> API - {baseUrl}</Text>
+        <Text style={{fontWeight : 'bold'}} color="#f2f2f2"> SERVIDOR - {baseUrl}</Text>
         <Box  >
         <Button
           mt={5}
@@ -197,6 +197,7 @@ export default function Login({ navigation }) {
       </Box>
 
         </Box>
+        
     </Box>
     
     </KeyboardAvoidingView>

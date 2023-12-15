@@ -299,7 +299,7 @@ const NovaContagem = ({ route }) => {
             <BarCodeScanner
               onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
               style={{
-                height: 200,
+                height: 500,
                 width: "100%",
               }}
             />

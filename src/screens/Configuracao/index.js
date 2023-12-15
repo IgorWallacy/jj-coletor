@@ -63,7 +63,7 @@ const ConfiguracaoComponent = ({ navigation }) => {
           subtitle="Informe o endereço do servidor para acesso "
         />
         <Card.Content>
-          <Text m='2'> {baseUrl ? 'Configuração atual : ' + baseUrl : ' Nenhuma configuração salva'}</Text>
+          <Text style={{fontWeight : 'bold'}} m='2'> {baseUrl ? 'Configuração atual : ' + baseUrl : ' Nenhuma configuração salva'}</Text>
           <TextInput
             keyboardType="url"
             label="Endereço do servidor"
