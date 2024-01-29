@@ -15,7 +15,7 @@ import {
   MD3Colors,
   Card,
   Text as TextP,
-  TextInput,
+  Button as ButtonNP,
 } from "react-native-paper";
 
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
@@ -142,6 +142,13 @@ const ListaInventarios = ({ navigation }) => {
                     <VStack space="1" p="2" w="96">
                       <Card>
                         <Card.Content>
+                        <Text
+                            fontWeight="extrabold"
+                            color={item?.status ? "green.800" : "red.500"}
+                            fontSize="md"
+                          >
+                             {item?.loja?.toUpperCase()}
+                          </Text>
                           <Text
                             fontWeight="extrabold"
                             color={item?.status ? "green.800" : "red.500"}
@@ -179,19 +186,12 @@ const ListaInventarios = ({ navigation }) => {
 
                           <HStack>
                             {item.status ? (
-                              <Button
-                                variant="solid"
-                                colorScheme="text"
-                                rounded="md"
-                                size="lg"
-                                m="2"
-                                rightIcon={
-                                  <FontAwesome5
-                                    name="barcode"
-                                    size={24}
-                                    color="white"
-                                  />
-                                }
+                              <>
+                              <Box m={1} p={1}>
+                              <ButtonNP
+                              icon="barcode"
+                              mode="contained"
+
                                 disabled={!item.status}
                                 onPress={() =>
                                   navigation.navigate("nova-contagem", {
@@ -200,7 +200,11 @@ const ListaInventarios = ({ navigation }) => {
                                 }
                               >
                                 {item.status ? "Iniciar contagem" : ""}
-                              </Button>
+                              </ButtonNP>
+                              </Box>
+                              
+                              </>
+                              
                             ) : (
                               <></>
                             )}

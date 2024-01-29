@@ -4,6 +4,7 @@ import Menu from "../screens/Menu";
 import ListaInventarios from "../screens/Inventario/Lista";
 import NovaContagem from "../screens/Inventario/Novo";
 import ConfiguracaoComponent from "../screens/Configuracao";
+import ListaProdutosRecontagem from "../screens/Inventario/Recontagem";
 
 const Stack = createStackNavigator();
 
@@ -60,6 +61,21 @@ export default function Routes() {
         name="lista-inventario"
         options={{
           title: "Escolha um inventário",
+          headerStyle: {
+            backgroundColor: "#708090",
+          },
+          headerTintColor: "#ffff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+        }}
+      />
+       <Stack.Screen
+        component={ListaProdutosRecontagem}
+        name="produtos-recontagem"
+        options={{
+          title: "Recontagem de produtos",
+          headerLeft: null,
           headerStyle: {
             backgroundColor: "#708090",
           },

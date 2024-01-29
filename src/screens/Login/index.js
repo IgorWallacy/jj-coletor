@@ -1,30 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFonts, Inter_900Black } from "@expo-google-fonts/inter";
-
 import base64 from "react-native-base64";
 import axios from "axios";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { Text, Box, Button, Image, KeyboardAvoidingView } from "native-base";
 import { Platform, Alert, ImageBackground } from "react-native";
 import { TextInput } from "react-native-paper";
 
-export default function Login({ navigation }) {
+export default function Login({ navigation , route }) {
   const [usuario, setUsuario] = useState();
   const [senha, setSenha] = useState();
   const [loading, setLoading] = useState(false);
-
-  const [baseUrl, setBaseUrl] = useState(null);
+  const [baseUrl, setBaseUrl] = useState(route?.ipServidor);
 
   let [fontsLoaded] = useFonts({
     Inter_900Black,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  useEffect(() => {
+    const getBaseURLAsyncStorage = async () => {
+      try {
+        const value = await AsyncStorage.getItem("ip-servidor");
+        if (value !== null) {
+          setBaseUrl(`http://${value}:1010`);
+        }
+      } catch (e) {
+        Alert.alert("Erro", "Não foi possível ler o ip do servidor");
+      }
+    };
+
+    getBaseURLAsyncStorage();
+  }, [route]); // The second argument (array) is empty to ensure it runs only once after the initial render.
 
   let clientId = "doks";
   let clientSecret = "1234";
@@ -42,33 +49,18 @@ export default function Login({ navigation }) {
     "content-type": "multipart/form-data",
   };
 
-  const getBaseURLAsyncStorage = async () => {
-    try {
-      const value = await AsyncStorage.getItem("ip-servidor");
-      if (value !== null) {
-        // value previously stored
-        setBaseUrl(`http://${value}:1010`);
-      }
-    } catch (e) {
-      // error reading value
-      Alert.alert("Erro", "Não foi possível ler o ip do servidor");
-    }
-  };
-
   const api = axios.create({
-    baseURL: baseUrl ? baseUrl : getBaseURLAsyncStorage(),
+    baseURL: baseUrl ? baseUrl : `http://default-url:1010`, // Provide a default value if baseUrl is not set
     headers: headers,
     params: params,
     timeout: 10000,
   });
 
   const login = async () => {
-    getBaseURLAsyncStorage();
     try {
       setLoading(true);
       try {
         const response = await api.post("/oauth/token", { params, headers });
-        //   localStorage.clear();
         const accessToken = JSON.stringify(response.data);
 
         try {
@@ -90,55 +82,49 @@ export default function Login({ navigation }) {
     }
   };
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <KeyboardAvoidingView
-    flex={1}
-    behavior={Platform.OS == "ios" ? "padding" : "height"}
-    w="100%"
-  >
-    
-     
-      
-     
-   
-      
-    <Box
       flex={1}
-      alignItems="center"
-      justifyContent="center"
-      bg={{
-        linearGradient: {
-          colors: ["#eb575a", "#708090"],
-          start: [1, 0],
-          end: [0, 0],
-        },
-      }}
-      
-      width="100%"
-      padding={5}
+      behavior={Platform.OS == "ios" ? "padding" : "height"}
+      w="100%"
     >
-      
-      <ImageBackground
-      resizeMode="contain"
-        source={require("../../../assets/images/logo_login.png")}
-        alt="Logo"
-        style={{ flex : 1, width: '100%', height: '100%'}}
-      ></ImageBackground>
-      
-      <Text fontSize="md" m="0.5" color="#FFFF">
-        Informe sua conta uniplus
-      </Text>
-     
+      <Box
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        bg={{
+          linearGradient: {
+            colors: ["#eb575a", "#708090"],
+            start: [1, 0],
+            end: [0, 0],
+          },
+        }}
+        width="100%"
+        padding={5}
+      >
+        <ImageBackground
+          resizeMode="contain"
+          source={require("../../../assets/images/logo_login.png")}
+          alt="Logo"
+          style={{ flex: 1, width: "100%", height: "100%" }}
+        ></ImageBackground>
+
+        <Text fontSize="md" m="0.5" color="#FFFF">
+          Informe sua conta uniplus
+        </Text>
+
         <Box m={2} w="100%">
           <TextInput
-            onFocus={() => getBaseURLAsyncStorage()}
+          //  onFocus={() => getBaseURLAsyncStorage()}
             value={usuario}
             onChangeText={(e) => setUsuario(e)}
             keyboardType="email-address"
             type="text"
-           
             size="2xl"
-          
             label="Código"
             mode="flat"
           />
@@ -150,9 +136,7 @@ export default function Login({ navigation }) {
             type="password"
             keyboardType="numbers-and-punctuation"
             secureTextEntry
-           
             size="2xl"
-           
             label="Senha"
           />
         </Box>
@@ -171,35 +155,38 @@ export default function Login({ navigation }) {
             Entrar
           </Button>
         </Box>
-        
-        <Box justifyContent="center" alignItems="center" >
-        <Text mt={10}
-        style={{
-          fontFamily: "Inter_900Black",
-          fontSize: 22,
-          color: "#f4f5f1",
-        }}
-      >
-        JJ Coletor
-      </Text>
-        <Text style={{fontWeight : 'bold'}} color="#f2f2f2"> SERVIDOR - {baseUrl}</Text>
-        <Box  >
-        <Button
-          mt={5}
-          leftIcon={<MaterialIcons name="settings" size={24} color="white" />}
-          colorScheme="warmGray"
-          borderRadius="full"
-          size="lg"
-          onPress={() => navigation.navigate("configuracao")}
-        >
-          <Text color="white">Configurar</Text>
-        </Button>
-      </Box>
 
+        <Box justifyContent="center" alignItems="center">
+          <Text
+            mt={10}
+            style={{
+              fontFamily: "Inter_900Black",
+              fontSize: 22,
+              color: "#f4f5f1",
+            }}
+          >
+            JJ Coletor
+          </Text>
+          <Text style={{ fontWeight: "bold" }} color="#f2f2f2">
+            {" "}
+            SERVIDOR - {baseUrl}
+          </Text>
+          <Box>
+            <Button
+              mt={5}
+              leftIcon={
+                <MaterialIcons name="settings" size={24} color="white" />
+              }
+              colorScheme="warmGray"
+              borderRadius="full"
+              size="lg"
+              onPress={() => navigation.navigate("configuracao")}
+            >
+              <Text color="white">Configurar</Text>
+            </Button>
+          </Box>
         </Box>
-        
-    </Box>
-    
+      </Box>
     </KeyboardAvoidingView>
   );
 }

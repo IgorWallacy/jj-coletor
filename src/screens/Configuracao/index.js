@@ -34,7 +34,9 @@ const ConfiguracaoComponent = ({ navigation }) => {
     try {
         await AsyncStorage.setItem('ip-servidor', servidor).then((r) => {
             Alert.alert('Sucesso' , 'Configuração salva')
-            navigation.navigate("Login")
+            navigation.navigate("Login", {
+              ipServidor : servidor
+            })
         })
       } catch (e) {
         
